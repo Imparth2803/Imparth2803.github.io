@@ -20,27 +20,22 @@ const illustration = {
 };
 
 const greeting = {
-  username: "Saad Pasta",
-  title: "Hi all, I'm Saad",
+  username: "Parth Tawde",
+  title: "Hi all, I'm Parth",
   subTitle: emoji(
-    "A passionate Full Stack Software Developer 🚀 having an experience of building Web and Mobile applications with JavaScript / Reactjs / Nodejs / React Native and some other cool libraries and frameworks."
+    "A Python Software Developer and MSc Data Science graduate 🚀 building web applications with Django and React, computer vision and image processing pipelines, AI-powered applications and design automation workflows."
   ),
-  resumeLink:
-    "https://drive.google.com/file/d/1ofFdKF_mqscH8WvXkSObnVvC9kK7Ldlu/view?usp=sharing", // Set to empty to hide the button
+  resumeLink: "resume", // Set to empty to hide the "Download my resume" button (file: src/containers/greeting/resume.pdf)
   displayGreeting: true // Set false to hide this section, defaults to true
 };
 
 // Social Media Links
 
 const socialMediaLinks = {
-  github: "https://github.com/saadpasta",
-  linkedin: "https://www.linkedin.com/in/saadpasta/",
-  gmail: "saadpasta70@gmail.com",
-  gitlab: "https://gitlab.com/saadpasta",
-  facebook: "https://www.facebook.com/saad.pasta7",
-  medium: "https://medium.com/@saadpasta",
-  stackoverflow: "https://stackoverflow.com/users/10422806/saad-pasta",
-  // Instagram, Twitter and Kaggle are also supported in the links!
+  github: "https://github.com/Imparth2803",
+  linkedin: "https://www.linkedin.com/in/parth-tawde/",
+  gmail: "parthtawde6r@gmail.com",
+  // Instagram, Twitter, Medium, Kaggle etc. are also supported in the links!
   // To customize icons and social links, tweak src/components/SocialMedia
   display: true // Set true to display this section, defaults to false
 };
@@ -49,14 +44,23 @@ const socialMediaLinks = {
 
 const skillsSection = {
   title: "What I do",
-  subTitle: "CRAZY FULL STACK DEVELOPER WHO WANTS TO EXPLORE EVERY TECH STACK",
+  subTitle:
+    "PYTHON DEVELOPER BUILDING AI, COMPUTER VISION AND AUTOMATION SOLUTIONS",
   skills: [
     emoji(
-      "⚡ Develop highly interactive Front end / User Interfaces for your web and mobile applications"
+      "⚡ Build full-stack web applications with Django, React, FastAPI, Node.js and Express"
     ),
-    emoji("⚡ Progressive Web Applications ( PWA ) in normal and SPA Stacks"),
     emoji(
-      "⚡ Integration of third party services such as Firebase/ AWS / Digital Ocean"
+      "⚡ Develop computer vision and image processing pipelines with OpenCV, Pillow and OCR"
+    ),
+    emoji(
+      "⚡ Create AI-powered applications with LangChain, LangGraph, Ollama and local LLMs"
+    ),
+    emoji(
+      "⚡ Train machine learning and deep learning models with TensorFlow, PyTorch, Keras and Scikit-learn"
+    ),
+    emoji(
+      "⚡ Automate design and product personalisation workflows with Playwright and Adobe tools"
     )
   ],
 
@@ -65,20 +69,16 @@ https://fontawesome.com/icons?d=gallery */
 
   softwareSkills: [
     {
-      skillName: "html-5",
-      fontAwesomeClassname: "fab fa-html5"
+      skillName: "python",
+      fontAwesomeClassname: "fab fa-python"
     },
     {
-      skillName: "css3",
-      fontAwesomeClassname: "fab fa-css3-alt"
+      skillName: "sql",
+      fontAwesomeClassname: "fas fa-database"
     },
     {
-      skillName: "sass",
-      fontAwesomeClassname: "fab fa-sass"
-    },
-    {
-      skillName: "JavaScript",
-      fontAwesomeClassname: "fab fa-js"
+      skillName: "django / fastapi",
+      fontAwesomeClassname: "fas fa-server"
     },
     {
       skillName: "reactjs",
@@ -89,32 +89,32 @@ https://fontawesome.com/icons?d=gallery */
       fontAwesomeClassname: "fab fa-node"
     },
     {
-      skillName: "swift",
-      fontAwesomeClassname: "fab fa-swift"
+      skillName: "typescript",
+      fontAwesomeClassname: "fab fa-js"
     },
     {
-      skillName: "npm",
-      fontAwesomeClassname: "fab fa-npm"
+      skillName: "computer vision",
+      fontAwesomeClassname: "fas fa-eye"
     },
     {
-      skillName: "sql-database",
-      fontAwesomeClassname: "fas fa-database"
+      skillName: "machine learning",
+      fontAwesomeClassname: "fas fa-brain"
     },
     {
-      skillName: "aws",
-      fontAwesomeClassname: "fab fa-aws"
+      skillName: "generative ai",
+      fontAwesomeClassname: "fas fa-robot"
     },
     {
-      skillName: "firebase",
-      fontAwesomeClassname: "fas fa-fire"
+      skillName: "data analysis",
+      fontAwesomeClassname: "fas fa-chart-bar"
     },
     {
-      skillName: "python",
-      fontAwesomeClassname: "fab fa-python"
+      skillName: "mongodb",
+      fontAwesomeClassname: "fas fa-leaf"
     },
     {
-      skillName: "docker",
-      fontAwesomeClassname: "fab fa-docker"
+      skillName: "git",
+      fontAwesomeClassname: "fab fa-git-alt"
     }
   ],
   display: true // Set false to hide this section, defaults to true
@@ -126,23 +126,24 @@ const educationInfo = {
   display: true, // Set false to hide this section, defaults to true
   schools: [
     {
-      schoolName: "Harvard University",
-      logo: require("./assets/images/harvardLogo.png"),
-      subHeader: "Master of Science in Computer Science",
-      duration: "September 2017 - April 2019",
-      desc: "Participated in the research of XXX and published 3 papers.",
+      schoolName: "University of Hertfordshire",
+      subHeader: "Master of Science (M.Sc.) in Data Science",
+      duration: "2024 - 2025",
+      desc: "First Class Distinction. United Kingdom.",
       descBullets: [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        "Medical Imaging Data Science Club (Clustered Minds): designed retinal image enhancement using K-Means + Fuzzy C-Means with spatial features",
+        "Earned Judges' Choice 4th place in a university-level data science competition"
       ]
     },
     {
-      schoolName: "Stanford University",
-      logo: require("./assets/images/stanfordLogo.png"),
-      subHeader: "Bachelor of Science in Computer Science",
-      duration: "September 2013 - April 2017",
-      desc: "Ranked top 10% in the program. Took courses about Software Engineering, Web Security, Operating Systems, ...",
-      descBullets: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit"]
+      schoolName: "MIT ADT University",
+      subHeader:
+        "Bachelor of Technology (B.Tech) in Computer Science Engineering",
+      duration: "2019 - 2023",
+      desc: "Pune, India.",
+      descBullets: [
+        "Published: High-Resolution Satellite Imagery Analysis for Terrain and Surface Data Extraction: Techniques and Applications (2023)"
+      ]
     }
   ]
 };
@@ -150,19 +151,19 @@ const educationInfo = {
 // Your top 3 proficient stacks/tech experience
 
 const techStack = {
-  viewSkillBars: true, //Set it to true to show Proficiency Section
+  viewSkillBars: false, //Set it to true to show Proficiency Section
   experience: [
     {
-      Stack: "Frontend/Design", //Insert stack or technology you have experience in
+      Stack: "Python / Backend", //Insert stack or technology you have experience in
       progressPercentage: "90%" //Insert relative proficiency in percentage
     },
     {
-      Stack: "Backend",
-      progressPercentage: "70%"
+      Stack: "Machine Learning / Computer Vision",
+      progressPercentage: "80%"
     },
     {
-      Stack: "Programming",
-      progressPercentage: "60%"
+      Stack: "Frontend",
+      progressPercentage: "65%"
     }
   ],
   displayCodersrank: false // Set true to display codersrank badges section need to changes your username in src/containers/skillProgress/skillProgress.js:17:62, defaults to false
@@ -174,29 +175,37 @@ const workExperiences = {
   display: true, //Set it to true to show workExperiences Section
   experience: [
     {
-      role: "Software Engineer",
-      company: "Facebook",
-      companylogo: require("./assets/images/facebookLogo.png"),
-      date: "June 2018 – Present",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      role: "Software Python Developer",
+      company: "Nijikart",
+      date: "Jan 2026 – Present",
+      desc: "Mumbai, India",
       descBullets: [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        "Build application features with Django and React, integrating backend processing with interactive workflows",
+        "Develop Python software and product personalisation workflows for digital products",
+        "Create personalised product assets using OpenCV, Pillow, Python libraries and Adobe tools",
+        "Use Playwright to automate design operations on products, turning repetitive manual work into scalable browser-based workflows"
       ]
     },
     {
-      role: "Front-End Developer",
-      company: "Quora",
-      companylogo: require("./assets/images/quoraLogo.png"),
-      date: "May 2017 – May 2018",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      role: "Analyst",
+      company: "NeuIQ",
+      date: "Oct 2025 – Jan 2026",
+      desc: "Mumbai, India",
+      descBullets: [
+        "Benchmarked model performance using statistical correlation metrics and evaluated proposed solutions",
+        "Produced LLM-generated open-ended responses and reports/dashboards to assess real vs. synthetic data quality",
+        "Generated CTGAN-based synthetic structured data aligned with real schemas while preserving distributions and relationships"
+      ]
     },
     {
-      role: "Software Engineer Intern",
-      company: "Airbnb",
-      companylogo: require("./assets/images/airbnbLogo.png"),
-      date: "Jan 2015 – Sep 2015",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      role: "Data Science Intern",
+      company: "Pinnotech Systems LLP",
+      date: "Jan 2023 – Aug 2023",
+      desc: "Thane, India",
+      descBullets: [
+        "Built a VGG19 transfer-learning model for plant disease classification using preprocessing, augmentation and feature extraction",
+        "Developed YOLO-based helmet, head and face detection using custom annotated datasets and mAP/IoU evaluation"
+      ]
     }
   ]
 };
@@ -212,31 +221,28 @@ const openSource = {
 // Some big projects you have worked on
 
 const bigProjects = {
-  title: "Big Projects",
-  subtitle: "SOME STARTUPS AND COMPANIES THAT I HELPED TO CREATE THEIR TECH",
+  title: "Projects",
+  subtitle: "SOME OF THE PROJECTS I HAVE BUILT",
   projects: [
     {
-      image: require("./assets/images/saayaHealthLogo.webp"),
-      projectName: "Saayahealth",
-      projectDesc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-      footerLink: [
-        {
-          name: "Visit Website",
-          url: "http://saayahealth.com/"
-        }
-        //  you can add extra buttons here.
-      ]
+      projectName: "AI-Powered Document Management System",
+      projectDesc:
+        "Full-stack DMS (React, TypeScript, Node.js, Express, MongoDB) with OCR for handwritten and scanned documents, and local AI (Qwen 2.5 via Ollama + GLiNER) for summaries, entity extraction, tagging and classification, backed by Python/FastAPI microservices."
     },
     {
-      image: require("./assets/images/nextuLogo.webp"),
-      projectName: "Nextu",
-      projectDesc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-      footerLink: [
-        {
-          name: "Visit Website",
-          url: "http://nextu.se/"
-        }
-      ]
+      projectName: "Skin Lesion Classification",
+      projectDesc:
+        "CNN in TensorFlow and a fine-tuned Vision Transformer in PyTorch for melanoma classification, using oversampling and weighted loss to handle class imbalance."
+    },
+    {
+      projectName: "High-Resolution Satellite Imagery Analysis",
+      projectDesc:
+        "CNN/U-Net models for land-cover, vegetation and urban-feature extraction, DEM/DTM/DSM generation for terrain reconstruction, and super-resolution with patch-wise training."
+    },
+    {
+      projectName: "Netflix Recommendation System",
+      projectDesc:
+        "Collaborative filtering with Probabilistic Matrix Factorization using SGD, L2 regularisation and Bayesian priors, with latent dimensions tuned to improve RMSE."
     }
   ],
   display: true // Set false to hide this section, defaults to true
@@ -246,58 +252,21 @@ const bigProjects = {
 // Include certificates, talks etc
 
 const achievementSection = {
-  title: emoji("Achievements And Certifications 🏆 "),
-  subtitle:
-    "Achievements, Certifications, Award Letters and Some Cool Stuff that I have done !",
+  title: emoji("Achievements And Publications 🏆 "),
+  subtitle: "Publications, awards and activities",
 
   achievementsCards: [
     {
-      title: "Google Code-In Finalist",
+      title: "Research Publication",
       subtitle:
-        "First Pakistani to be selected as Google Code-in Finalist from 4000 students from 77 different countries.",
-      image: require("./assets/images/codeInLogo.webp"),
-      imageAlt: "Google Code-In Logo",
-      footerLink: [
-        {
-          name: "Certification",
-          url: "https://drive.google.com/file/d/0B7kazrtMwm5dYkVvNjdNWjNybWJrbndFSHpNY2NFV1p4YmU0/view?usp=sharing"
-        },
-        {
-          name: "Award Letter",
-          url: "https://drive.google.com/file/d/0B7kazrtMwm5dekxBTW5hQkg2WXUyR3QzQmR0VERiLXlGRVdF/view?usp=sharing"
-        },
-        {
-          name: "Google Code-in Blog",
-          url: "https://opensource.googleblog.com/2019/01/google-code-in-2018-winners.html"
-        }
-      ]
+        "High-Resolution Satellite Imagery Analysis for Terrain and Surface Data Extraction: Techniques and Applications (2023).",
+      footerLink: []
     },
     {
-      title: "Google Assistant Action",
+      title: "Judges' Choice – 4th Place",
       subtitle:
-        "Developed a Google Assistant Action JavaScript Guru that is available on 2 Billion devices world wide.",
-      image: require("./assets/images/googleAssistantLogo.webp"),
-      imageAlt: "Google Assistant Action Logo",
-      footerLink: [
-        {
-          name: "View Google Assistant Action",
-          url: "https://assistant.google.com/services/a/uid/000000100ee688ee?hl=en"
-        }
-      ]
-    },
-
-    {
-      title: "PWA Web App Developer",
-      subtitle: "Completed Certifcation from SMIT for PWA Web App Development",
-      image: require("./assets/images/pwaLogo.webp"),
-      imageAlt: "PWA Logo",
-      footerLink: [
-        {name: "Certification", url: ""},
-        {
-          name: "Final Project",
-          url: "https://pakistan-olx-1.firebaseapp.com/"
-        }
-      ]
+        "University-level data science competition (University of Hertfordshire, 2025) for retinal image enhancement using K-Means + Fuzzy C-Means.",
+      footerLink: []
     }
   ],
   display: true // Set false to hide this section, defaults to true
@@ -307,56 +276,30 @@ const achievementSection = {
 
 const blogSection = {
   title: "Blogs",
-  subtitle:
-    "With Love for Developing cool stuff, I love to write and teach others what I have learnt.",
+  subtitle: "Things I have written about.",
   displayMediumBlogs: "true", // Set true to display fetched medium blogs instead of hardcoded ones
-  blogs: [
-    {
-      url: "https://blog.usejournal.com/create-a-google-assistant-action-and-win-a-google-t-shirt-and-cloud-credits-4a8d86d76eae",
-      title: "Win a Google Assistant Tshirt and $200 in Google Cloud Credits",
-      description:
-        "Do you want to win $200 and Google Assistant Tshirt by creating a Google Assistant Action in less then 30 min?"
-    },
-    {
-      url: "https://medium.com/@saadpasta/why-react-is-the-best-5a97563f423e",
-      title: "Why REACT is The Best?",
-      description:
-        "React is a JavaScript library for building User Interface. It is maintained by Facebook and a community of individual developers and companies."
-    }
-  ],
-  display: true // Set false to hide this section, defaults to true
+  blogs: [],
+  display: false // Set true once MEDIUM_USERNAME is set in .github/workflows/deploy.yml
 };
 
 // Talks Sections
 
 const talkSection = {
   title: "TALKS",
-  subtitle: emoji(
-    "I LOVE TO SHARE MY LIMITED KNOWLEDGE AND GET A SPEAKER BADGE 😅"
-  ),
-
-  talks: [
-    {
-      title: "Build Actions For Google Assistant",
-      subtitle: "Codelab at GDG DevFest Karachi 2019",
-      slides_url: "https://bit.ly/saadpasta-slides",
-      event_url: "https://www.facebook.com/events/2339906106275053/"
-    }
-  ],
-  display: true // Set false to hide this section, defaults to true
+  subtitle: "",
+  talks: [],
+  display: false // Set false to hide this section, defaults to true
 };
 
 // Podcast Section
 
 const podcastSection = {
   title: emoji("Podcast 🎙️"),
-  subtitle: "I LOVE TO TALK ABOUT MYSELF AND TECHNOLOGY",
+  subtitle: "",
 
   // Please Provide with Your Podcast embeded Link
-  podcast: [
-    "https://anchor.fm/codevcast/embed/episodes/DevStory---Saad-Pasta-from-Karachi--Pakistan-e9givv/a-a15itvo"
-  ],
-  display: true // Set false to hide this section, defaults to true
+  podcast: [],
+  display: false // Set false to hide this section, defaults to true
 };
 
 // Resume Section
@@ -372,15 +315,15 @@ const contactInfo = {
   title: emoji("Contact Me ☎️"),
   subtitle:
     "Discuss a project or just want to say hi? My Inbox is open for all.",
-  number: "+92-0000000000",
-  email_address: "saadpasta70@gmail.com"
+  number: "", // Add a phone number here to show it publicly
+  email_address: "parthtawde6r@gmail.com"
 };
 
 // Twitter Section
 
 const twitterDetails = {
   userName: "twitter", //Replace "twitter" with your twitter username without @
-  display: true // Set true to display this section, defaults to false
+  display: false // Set true to display this section, defaults to false
 };
 
 const isHireable = false; // Set false if you are not looking for a job. Also isHireable will be display as Open for opportunities: Yes/No in the GitHub footer
