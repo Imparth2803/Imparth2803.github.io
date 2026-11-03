@@ -49,7 +49,13 @@ export default function ExperienceCard({cardInfo, isDark}) {
           />
         )}
       </div>
-      <div className="experience-text-details">
+      <div
+        className={
+          cardInfo.companylogo
+            ? "experience-text-details"
+            : "experience-text-details experience-text-details-nologo"
+        }
+      >
         <h5
           className={
             isDark

@@ -1,0 +1,104 @@
+@import "../../_globalColor";
+
+.section-block {
+  position: relative;
+  margin-top: 5rem;
+}
+
+.section-bar {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  width: 90%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 20px;
+  border-top: 1px solid $hairline;
+  border-bottom: 1px solid $hairline;
+  background-color: $barBackground;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: $monoFont;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $inkSoft;
+}
+
+/* "+" registration marks on the bar's outer corners */
+.section-bar::before,
+.section-bar::after {
+  content: "+";
+  position: absolute;
+  top: -9px;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0;
+  color: $inkMuted;
+}
+.section-bar::before {
+  left: -5px;
+}
+.section-bar::after {
+  right: -5px;
+}
+
+.section-bar-index {
+  color: $ink;
+  white-space: nowrap;
+}
+.section-bar-slash {
+  margin: 0 0.7em;
+  color: $inkMuted;
+}
+
+.section-bar-caption {
+  color: $inkMuted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dark-mode .section-bar {
+  border-color: $hairlineDark;
+  background-color: $barBackgroundDark;
+  color: $inkSoftDark;
+}
+.dark-mode .section-bar-index {
+  color: $textColorDark;
+}
+.dark-mode .section-bar::before,
+.dark-mode .section-bar::after,
+.dark-mode .section-bar-slash,
+.dark-mode .section-bar-caption {
+  color: $inkMutedDark;
+}
+
+/* Sections already have their own top spacing; tighten it below the bar */
+.section-block .main,
+.section-block .education-section,
+.section-block .experience-container {
+  margin-top: 1rem !important;
+}
+.section-block h1 {
+  margin-top: 0.35em;
+}
+
+@media (max-width: 768px) {
+  .section-block {
+    margin-top: 3rem;
+  }
+  .section-bar {
+    padding: 11px 14px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+  .section-bar-caption {
+    display: none;
+  }
+}

@@ -1,0 +1,290 @@
+@import "../../_globalColor";
+
+/* ---------- Narrow screens: top bar + % badge ---------- */
+.scroll-scale-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: $accent1;
+  z-index: 1001;
+  pointer-events: none;
+  display: none;
+}
+.scroll-scale-badge {
+  display: none;
+}
+
+/* ---------- Desktop ruler ---------- */
+.ruler {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 56px;
+  z-index: 1000;
+  overflow: hidden;
+  cursor: crosshair;
+  font-family: $monoFont;
+  color: $ink;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+  transition: width 0.22s ease;
+}
+.ruler:focus-visible {
+  box-shadow: inset 2px 0 0 $accent1;
+}
+.ruler-open {
+  width: 236px;
+}
+
+/* Frosted strip that fades out toward the content */
+.ruler-glass {
+  position: absolute;
+  inset: 0;
+  background-color: $rulerGlass;
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  -webkit-mask-image: linear-gradient(to left, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 45%, transparent 100%);
+}
+.ruler-open .ruler-glass {
+  -webkit-mask-image: linear-gradient(to left, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 70%, transparent 100%);
+}
+
+/* Ticks (shared by the moving track and the overview) */
+.ruler-track,
+.ruler-overview {
+  position: absolute;
+  left: 0;
+  right: 0;
+  will-change: transform;
+  transition: opacity 0.18s ease;
+}
+.ruler-overview {
+  opacity: 0;
+}
+.ruler-open .ruler-track {
+  opacity: 0;
+}
+.ruler-open .ruler-overview {
+  opacity: 1;
+}
+
+.ruler-tick {
+  position: absolute;
+  right: 0;
+  width: 7px;
+  height: 1px;
+  background: $ink;
+  opacity: 0.3;
+}
+.ruler-tick-mid {
+  width: 12px;
+  opacity: 0.55;
+}
+.ruler-tick-major {
+  width: 18px;
+  opacity: 0.8;
+}
+.ruler-label {
+  position: absolute;
+  right: 22px;
+  top: -6px;
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible-window box + pointer line (overview only) */
+.ruler-window {
+  position: absolute;
+  right: 0;
+  width: 56px;
+  background: $rulerWindow;
+  border-top: 1px solid $inkMuted;
+  border-bottom: 1px solid $inkMuted;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.ruler-open .ruler-window {
+  opacity: 1;
+}
+.ruler-hover-line {
+  position: absolute;
+  right: 0;
+  width: 56px;
+  height: 2px;
+  margin-top: -1px;
+  background: $ink;
+  pointer-events: none;
+}
+.ruler-hover-line span {
+  position: absolute;
+  right: 4px;
+  top: -15px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+/* Reading line: always visible, marks the current position */
+.ruler-reading {
+  position: absolute;
+  right: 0;
+  width: 56px;
+  height: 1px;
+  background: $accent1;
+  box-shadow: 0 0 0 3px $accentSoft;
+  pointer-events: none;
+}
+.ruler-reading-value {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0.06em;
+  color: $accent1;
+  font-variant-numeric: tabular-nums;
+}
+.ruler-reading-section {
+  position: absolute;
+  right: 64px;
+  top: -7px;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $accent1;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+/* Section index, laid out at each section's real position */
+.ruler-sections {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.ruler-open .ruler-sections {
+  opacity: 1;
+  pointer-events: auto;
+}
+.ruler-section {
+  position: absolute;
+  right: 64px;
+  transform: translateY(-50%);
+}
+.ruler-section button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 4px;
+  font-family: $monoFont;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $inkMuted;
+  transition: color 0.15s ease;
+}
+.ruler-section button:hover,
+.ruler-section button:focus-visible {
+  color: $ink;
+}
+.ruler-section-number {
+  opacity: 0.6;
+}
+.ruler-section-active button {
+  color: $accent1;
+  font-weight: 700;
+}
+
+/* ---------- Dark mode ---------- */
+.dark-mode .ruler {
+  color: $textColorDark;
+}
+.dark-mode .ruler-glass {
+  background-color: $rulerGlassDark;
+}
+.dark-mode .ruler-tick,
+.dark-mode .ruler-hover-line {
+  background: $textColorDark;
+}
+.dark-mode .ruler-window {
+  background: $rulerWindowDark;
+  border-color: $inkMutedDark;
+}
+.dark-mode .ruler-reading {
+  background: $accentLight;
+  box-shadow: 0 0 0 3px $accentSoftDark;
+}
+.dark-mode .ruler-reading-value,
+.dark-mode .ruler-reading-section,
+.dark-mode .ruler-section-active button {
+  color: $accentLight;
+}
+.dark-mode .ruler-section button {
+  color: $inkMutedDark;
+}
+.dark-mode .ruler-section button:hover {
+  color: $textColorDark;
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 1100px) {
+  .ruler {
+    display: none;
+  }
+  .scroll-scale-bar {
+    display: block;
+  }
+  .scroll-scale-badge {
+    display: block;
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    padding: 2px 8px;
+    border: 1px solid $hairline;
+    background: $rulerGlass;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: $ink;
+    font-family: $monoFont;
+    font-size: 11px;
+    line-height: 17px;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    z-index: 1001;
+    pointer-events: none;
+  }
+  .dark-mode .scroll-scale-badge {
+    border-color: $hairlineDark;
+    background: $rulerGlassDark;
+    color: $textColorDark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ruler,
+  .ruler-track,
+  .ruler-overview,
+  .ruler-window,
+  .ruler-sections {
+    transition: none;
+  }
+}

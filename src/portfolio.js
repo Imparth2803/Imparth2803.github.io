@@ -22,8 +22,9 @@ const illustration = {
 const greeting = {
   username: "Parth Tawde",
   title: "Hi all, I'm Parth",
+  titleHighlight: "Parth", // Word in the title shown in the accent color
   subTitle: emoji(
-    "A Python Software Developer and MSc Data Science graduate 🚀 building web applications with Django and React, computer vision and image processing pipelines, AI-powered applications and design automation workflows."
+    "Python developer and MSc Data Science graduate building AI, computer vision and automation tools 🚀"
   ),
   resumeLink: "resume", // Set to empty to hide the "Download my resume" button (file: src/containers/greeting/resume.pdf)
   displayGreeting: true // Set false to hide this section, defaults to true
@@ -90,7 +91,7 @@ https://fontawesome.com/icons?d=gallery */
     },
     {
       skillName: "typescript",
-      fontAwesomeClassname: "fab fa-js"
+      fontAwesomeClassname: "fas fa-code"
     },
     {
       skillName: "computer vision",
@@ -227,22 +228,34 @@ const bigProjects = {
     {
       projectName: "AI-Powered Document Management System",
       projectDesc:
-        "Full-stack DMS (React, TypeScript, Node.js, Express, MongoDB) with OCR for handwritten and scanned documents, and local AI (Qwen 2.5 via Ollama + GLiNER) for summaries, entity extraction, tagging and classification, backed by Python/FastAPI microservices."
+        "Full-stack DMS with OCR for handwritten and scanned documents, plus local AI for summaries, entity extraction, tagging and classification.",
+      tags: [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "MongoDB",
+        "FastAPI",
+        "Ollama",
+        "OCR"
+      ]
     },
     {
       projectName: "Skin Lesion Classification",
       projectDesc:
-        "CNN in TensorFlow and a fine-tuned Vision Transformer in PyTorch for melanoma classification, using oversampling and weighted loss to handle class imbalance."
+        "Melanoma classification with a custom CNN and a fine-tuned Vision Transformer, tackling class imbalance with oversampling and weighted loss.",
+      tags: ["TensorFlow", "PyTorch", "ViT", "Medical Imaging"]
     },
     {
       projectName: "High-Resolution Satellite Imagery Analysis",
       projectDesc:
-        "CNN/U-Net models for land-cover, vegetation and urban-feature extraction, DEM/DTM/DSM generation for terrain reconstruction, and super-resolution with patch-wise training."
+        "U-Net models for land-cover and urban-feature extraction, with DEM/DTM/DSM terrain reconstruction and super-resolution.",
+      tags: ["U-Net", "CNN", "Remote Sensing", "Published"]
     },
     {
       projectName: "Netflix Recommendation System",
       projectDesc:
-        "Collaborative filtering with Probabilistic Matrix Factorization using SGD, L2 regularisation and Bayesian priors, with latent dimensions tuned to improve RMSE."
+        "Collaborative filtering with Probabilistic Matrix Factorization, tuned with SGD, L2 regularisation and Bayesian priors to lower RMSE.",
+      tags: ["Python", "Matrix Factorization", "RecSys"]
     }
   ],
   display: true // Set false to hide this section, defaults to true
