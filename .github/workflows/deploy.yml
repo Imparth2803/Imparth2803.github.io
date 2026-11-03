@@ -14,6 +14,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to push the built site to the gh-pages branch
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3 # If you're using actions/checkout@v3 you must set persist-credentials to false in most cases for the deployment to work correctly.
@@ -24,9 +26,6 @@ jobs:
         uses: actions/setup-node@v3.8.1
         with:
           node-version: 18.x
-
-      - name: Update npm 🚀
-        run: npm install -g npm@latest
 
       - name: Install and Build 🔧 # Build the Project
         run: |
