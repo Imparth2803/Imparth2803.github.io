@@ -22,6 +22,7 @@ const illustration = {
 const greeting = {
   username: "Parth Tawde",
   title: "Hi all, I'm Parth",
+  titleHighlight: "Parth", // Word in the title shown in the accent color
   subTitle: emoji(
     "Python developer and MSc Data Science graduate building AI, computer vision and automation tools 🚀"
   ),

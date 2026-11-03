@@ -102,3 +102,22 @@ $accentSoft: rgba(79, 70, 229, 0.08);
 $accentSoftDark: rgba(129, 140, 248, 0.16);
 $scaleTrack: rgba(134, 142, 150, 0.25);
 $scaleTick: rgba(134, 142, 150, 0.6);
+
+// blueprint / editorial tokens
+$monoFont: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+  "Liberation Mono", monospace;
+$paper: #f2f1ee;
+$ink: #101014;
+$inkSoft: #3c3c43;
+$inkMuted: #8a8a93;
+$inkSoftDark: #c9cad3;
+$inkMutedDark: #7d8091;
+$hairline: rgba(16, 16, 20, 0.12);
+$hairlineDark: rgba(255, 255, 255, 0.1);
+$barBackground: rgba(242, 241, 238, 0.82);
+$barBackgroundDark: rgba(23, 28, 40, 0.82);
+$rulerGlass: rgba(242, 241, 238, 0.6);
+$rulerGlassDark: rgba(23, 28, 40, 0.6);
+$rulerWindow: rgba(16, 16, 20, 0.08);
+$rulerWindowDark: rgba(255, 255, 255, 0.08);
+$accentLight: #818cf8;

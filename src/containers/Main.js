@@ -14,6 +14,7 @@ import Podcast from "./podcast/Podcast";
 import Education from "./education/Education";
 import ScrollToTopButton from "./topbutton/Top";
 import ScrollScale from "../components/scrollScale/ScrollScale";
+import SectionBlock from "../components/sectionBar/SectionBar";
 import Twitter from "./twitter-embed/twitter";
 import Profile from "./profile/Profile";
 import SplashScreen from "./splashScreen/SplashScreen";
@@ -46,7 +47,10 @@ const Main = () => {
   };
 
   return (
-    <div className={isDark ? "dark-mode app-root" : "app-root"}>
+    <div
+      id="page-content"
+      className={isDark ? "dark-mode app-root" : "app-root"}
+    >
       <StyleProvider value={{isDark: isDark, changeTheme: changeTheme}}>
         {isShowingSplashAnimation && splashScreen.enabled ? (
           <SplashScreen />
@@ -54,18 +58,30 @@ const Main = () => {
           <>
             <Header />
             <Greeting />
-            <Skills />
-            <StackProgress />
-            <Education />
-            <WorkExperience />
-            <Projects />
-            <StartupProject />
-            <Achievement />
+            <SectionBlock sectionKey="skills">
+              <Skills />
+              <StackProgress />
+            </SectionBlock>
+            <SectionBlock sectionKey="education">
+              <Education />
+            </SectionBlock>
+            <SectionBlock sectionKey="experience">
+              <WorkExperience />
+            </SectionBlock>
+            <SectionBlock sectionKey="projects">
+              <StartupProject />
+              <Projects />
+            </SectionBlock>
+            <SectionBlock sectionKey="achievements">
+              <Achievement />
+            </SectionBlock>
             <Blogs />
             <Talks />
             <Twitter />
             <Podcast />
-            <Profile />
+            <SectionBlock sectionKey="contact">
+              <Profile />
+            </SectionBlock>
             <Footer />
             <ScrollToTopButton />
             <ScrollScale />

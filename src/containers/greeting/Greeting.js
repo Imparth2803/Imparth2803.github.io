@@ -9,6 +9,19 @@ import Button from "../../components/button/Button";
 import {illustration, greeting} from "../../portfolio";
 import StyleContext from "../../contexts/StyleContext";
 
+// Wraps the first occurrence of `highlight` in the title with an accent span
+function renderTitle(title, highlight) {
+  const i = highlight ? title.indexOf(highlight) : -1;
+  if (i < 0) return title;
+  return (
+    <>
+      {title.slice(0, i)}
+      <span className="greeting-highlight">{highlight}</span>
+      {title.slice(i + highlight.length)}
+    </>
+  );
+}
+
 export default function Greeting() {
   const {isDark} = useContext(StyleContext);
   if (!greeting.displayGreeting) {
@@ -24,7 +37,7 @@ export default function Greeting() {
                 className={isDark ? "dark-mode greeting-text" : "greeting-text"}
               >
                 {" "}
-                {greeting.title}{" "}
+                {renderTitle(greeting.title, greeting.titleHighlight)}{" "}
                 <span className="wave-emoji">{emoji("👋")}</span>
               </h1>
               <p
