@@ -41,6 +41,7 @@ export default function Projects() {
   }
   if (
     !(typeof repo === "string" || repo instanceof String) &&
+    repo.length > 0 &&
     openSource.display
   ) {
     return (

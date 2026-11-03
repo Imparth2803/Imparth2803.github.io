@@ -1,0 +1,207 @@
+@import "./_globalColor";
+
+/* Site-wide visual polish layered on top of the developerFolio styles. */
+
+/* Soft colored glow behind the top of the page */
+.app-root {
+  min-height: 100vh;
+  background-image: radial-gradient(
+      circle at 8% 0%,
+      rgba(79, 70, 229, 0.12),
+      transparent 38%
+    ),
+    radial-gradient(circle at 92% 6%, rgba(8, 145, 178, 0.1), transparent 34%);
+  background-repeat: no-repeat;
+}
+.app-root.dark-mode {
+  background-image: radial-gradient(
+      circle at 8% 0%,
+      rgba(99, 102, 241, 0.22),
+      transparent 38%
+    ),
+    radial-gradient(circle at 92% 6%, rgba(8, 145, 178, 0.16), transparent 34%);
+}
+
+/* Hero: gradient headline */
+.greeting-text {
+  background: $accentGradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding-bottom: 0.08em;
+}
+.greeting-text .wave-emoji {
+  -webkit-text-fill-color: initial;
+}
+
+/* Hero buttons: spacing that also works when they wrap on mobile */
+.button-greeting-div {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.button-greeting-div .main-button {
+  margin-right: 0;
+}
+@media (max-width: 768px) {
+  .button-greeting-div {
+    justify-content: center;
+  }
+}
+
+/* Buttons */
+.main-button {
+  background: $accentGradient;
+  background-size: 200% 100%;
+  border: none;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 20px -8px $accentShadow;
+}
+.main-button:hover {
+  background: $accentGradient;
+  background-position: 100% 0;
+  color: $textColorDark;
+  box-shadow: 0 12px 24px -8px $accentShadow;
+}
+
+/* Section headings get a short gradient underline */
+.skills-heading,
+.experience-heading,
+.education-heading,
+.achievement-heading,
+.project-title,
+.prof-title,
+.contact-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.skills-heading::after,
+.experience-heading::after,
+.education-heading::after,
+.achievement-heading::after,
+.project-title::after,
+.prof-title::after,
+.contact-title::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin-top: 12px;
+  border-radius: 4px;
+  background: $accentGradient;
+}
+@media (max-width: 768px) {
+  .skills-heading::after,
+  .achievement-heading::after,
+  .prof-title::after,
+  .contact-title::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Skill icons pick up the accent on hover */
+.software-skill-inline > i {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.software-skill-inline:hover > i {
+  color: $accent1;
+  transform: translateY(-3px);
+}
+
+/* Cards: accent top edge + lift on hover */
+.project-card,
+.certificate-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.project-card::before,
+.certificate-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: $accentGradient;
+}
+.project-card,
+.certificate-card,
+.experience-card,
+.experience-card-dark {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.project-card:hover,
+.certificate-card:hover,
+.experience-card:hover,
+.experience-card-dark:hover {
+  transform: translateY(-6px);
+}
+
+/* Project cards: left-aligned text and tech chips */
+.project-card {
+  justify-content: flex-start;
+}
+.project-detail {
+  text-align: left;
+}
+.project-detail .card-title {
+  font-size: 20px;
+  line-height: 1.3;
+}
+.project-detail .card-subtitle {
+  font-size: 16px;
+}
+.project-tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.project-tech-tag {
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: $accent1;
+  background: $accentSoft;
+  border: 1px solid rgba(79, 70, 229, 0.18);
+}
+.dark-mode .project-tech-tag {
+  color: #c7d2fe;
+  background: $accentSoftDark;
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+/* Experience cards: gradient banner, rounder corners */
+.experience-card,
+.experience-card-dark {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.experience-text-company {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.experience-text-details-nologo {
+  margin-top: 0;
+}
+
+/* Let the page glow show through section wrappers in dark mode */
+.app-root.dark-mode .dark-mode {
+  background-color: transparent;
+}
+.app-root.dark-mode .dark-mode.project-card,
+.app-root.dark-mode .dark-mode.certificate-card {
+  background-color: $darkBackground;
+}
+
+/* Hero buttons: rely on gap instead of per-button margins */
+.button-greeting-div .main-button {
+  margin-top: 0;
+}
