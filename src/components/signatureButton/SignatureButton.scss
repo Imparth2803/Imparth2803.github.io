@@ -1,0 +1,52 @@
+@import "../../_globalColor";
+
+/* Signature-style "Reach out" button, same font as the header logo */
+.signature-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+  padding: 0.6rem 1.6rem;
+  font-size: 2rem;
+  line-height: normal;
+  color: $signatureColor;
+  text-decoration: none;
+  border: 1.5px solid rgba(85, 26, 139, 0.25);
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+
+.signature-btn:hover {
+  border-color: $signatureColor;
+  background-color: rgba(85, 26, 139, 0.06);
+  transform: translateY(-2px);
+}
+
+.signature-text {
+  font-family: "Agustina Regular";
+  font-weight: bold;
+  font-variant-ligatures: no-common-ligatures;
+  -webkit-font-variant-ligatures: no-common-ligatures;
+  padding: 0 0.4rem;
+  word-spacing: 0.25em;
+}
+
+.signature-bracket {
+  color: $subTitle;
+}
+
+a.signature-btn.signature-btn-dark {
+  color: $signatureColorDark;
+  border-color: rgba(196, 167, 255, 0.3);
+}
+
+a.signature-btn.signature-btn-dark:hover {
+  border-color: $signatureColorDark;
+  background-color: rgba(196, 167, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .signature-btn {
+    font-size: 1.5rem;
+  }
+}

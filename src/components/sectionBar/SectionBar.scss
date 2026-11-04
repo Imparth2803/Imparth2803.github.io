@@ -49,8 +49,22 @@
 }
 
 .section-bar-index {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
   color: $ink;
   white-space: nowrap;
+}
+
+/* Room for the large section title that flies in from the left ruler
+   (see SectionRail). Keep in sync with TITLE_SPACE there. */
+.section-title-space {
+  height: 72px;
+}
+@media (max-width: 1100px) {
+  .section-title-space {
+    display: none;
+  }
 }
 .section-bar-slash {
   margin: 0 0.7em;
