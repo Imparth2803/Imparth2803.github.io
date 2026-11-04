@@ -79,7 +79,10 @@
 
 .experience-roundedimg {
   position: absolute;
-  object-fit: cover;
+  object-fit: contain;
+  box-sizing: border-box;
+  padding: 0.6rem;
+  background-color: #ffffff;
   left: 0;
   right: 0;
   top: 7rem;

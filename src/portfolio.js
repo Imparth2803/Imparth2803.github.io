@@ -34,7 +34,7 @@ const greeting = {
 
 const socialMediaLinks = {
   github: "https://github.com/Imparth2803",
-  linkedin: "https://www.linkedin.com/in/parth-tawde/",
+  linkedin: "https://www.linkedin.com/in/parth-tawde-549435211/",
   gmail: "parthtawde6r@gmail.com",
   // Instagram, Twitter, Medium, Kaggle etc. are also supported in the links!
   // To customize icons and social links, tweak src/components/SocialMedia
@@ -178,6 +178,7 @@ const workExperiences = {
     {
       role: "Software Python Developer",
       company: "Nijikart",
+      companylogo: require("./assets/images/Nijikart.jpeg"),
       date: "Jan 2026 – Present",
       desc: "Mumbai, India",
       descBullets: [
@@ -190,6 +191,7 @@ const workExperiences = {
     {
       role: "Analyst",
       company: "NeuIQ",
+      companylogo: require("./assets/images/Neu.jpeg"),
       date: "Oct 2025 – Jan 2026",
       desc: "Mumbai, India",
       descBullets: [
@@ -201,6 +203,7 @@ const workExperiences = {
     {
       role: "Data Science Intern",
       company: "Pinnotech Systems LLP",
+      companylogo: require("./assets/images/pinnotech.jpeg"),
       date: "Jan 2023 – Aug 2023",
       desc: "Thane, India",
       descBullets: [
@@ -243,19 +246,37 @@ const bigProjects = {
       projectName: "Skin Lesion Classification",
       projectDesc:
         "Melanoma classification with a custom CNN and a fine-tuned Vision Transformer, tackling class imbalance with oversampling and weighted loss.",
-      tags: ["TensorFlow", "PyTorch", "ViT", "Medical Imaging"]
+      tags: ["TensorFlow", "PyTorch", "ViT", "Medical Imaging"],
+      footerLink: [
+        {
+          name: "View Code",
+          url: "https://github.com/Imparth2803/Data-Science-Project"
+        }
+      ]
     },
     {
       projectName: "High-Resolution Satellite Imagery Analysis",
       projectDesc:
         "U-Net models for land-cover and urban-feature extraction, with DEM/DTM/DSM terrain reconstruction and super-resolution.",
-      tags: ["U-Net", "CNN", "Remote Sensing", "Published"]
+      tags: ["U-Net", "CNN", "Remote Sensing", "Published"],
+      footerLink: [
+        {
+          name: "Read Publication",
+          url: "https://ieeexplore.ieee.org/abstract/document/10392073/authors#authors"
+        }
+      ]
     },
     {
       projectName: "Netflix Recommendation System",
       projectDesc:
         "Collaborative filtering with Probabilistic Matrix Factorization, tuned with SGD, L2 regularisation and Bayesian priors to lower RMSE.",
-      tags: ["Python", "Matrix Factorization", "RecSys"]
+      tags: ["Python", "Matrix Factorization", "RecSys"],
+      footerLink: [
+        {
+          name: "View Code",
+          url: "https://github.com/Imparth2803/ML_NN"
+        }
+      ]
     }
   ],
   display: true // Set false to hide this section, defaults to true
@@ -273,7 +294,12 @@ const achievementSection = {
       title: "Research Publication",
       subtitle:
         "High-Resolution Satellite Imagery Analysis for Terrain and Surface Data Extraction: Techniques and Applications (2023).",
-      footerLink: []
+      footerLink: [
+        {
+          name: "Read on IEEE Xplore",
+          url: "https://ieeexplore.ieee.org/abstract/document/10392073/authors#authors"
+        }
+      ]
     },
     {
       title: "Judges' Choice – 4th Place",
@@ -329,7 +355,8 @@ const contactInfo = {
   subtitle:
     "Discuss a project or just want to say hi? My Inbox is open for all.",
   number: "", // Add a phone number here to show it publicly
-  email_address: "parthtawde6r@gmail.com"
+  email_address: "parthtawde6r@gmail.com",
+  buttonText: "Reach out to me" // Signature-style button text in the Contact section
 };
 
 // Twitter Section

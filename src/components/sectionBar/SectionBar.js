@@ -11,13 +11,15 @@ export default function SectionBlock({sectionKey, children}) {
   return (
     <section className="section-block" id={section.domId}>
       <div className="section-bar">
-        <span className="section-bar-index">
+        <h2 className="section-bar-index">
           {section.number}
           <span className="section-bar-slash">/</span>
           {section.label}
-        </span>
+        </h2>
         <span className="section-bar-caption">{section.caption}</span>
       </div>
+      {/* Empty slot where the section title from the left ruler lands */}
+      <div className="section-title-space" aria-hidden="true" />
       {children}
     </section>
   );

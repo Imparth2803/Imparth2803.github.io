@@ -21,7 +21,6 @@ export default function StartupProject() {
     <Fade bottom duration={1000} distance="20px">
       <div className="main" id="projects">
         <div>
-          <h1 className="skills-heading">{bigProjects.title}</h1>
           <p
             className={
               isDark

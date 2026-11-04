@@ -14,6 +14,7 @@ import Podcast from "./podcast/Podcast";
 import Education from "./education/Education";
 import ScrollToTopButton from "./topbutton/Top";
 import ScrollScale from "../components/scrollScale/ScrollScale";
+import SectionRail from "../components/sectionRail/SectionRail";
 import SectionBlock from "../components/sectionBar/SectionBar";
 import Twitter from "./twitter-embed/twitter";
 import Profile from "./profile/Profile";
@@ -85,6 +86,7 @@ const Main = () => {
             <Footer />
             <ScrollToTopButton />
             <ScrollScale />
+            <SectionRail />
           </>
         )}
       </StyleProvider>
