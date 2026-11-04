@@ -257,37 +257,53 @@ export default function SectionRail() {
   };
 
   return (
-    <div className="section-rail" ref={rootRef} aria-hidden="true">
-      <div className="rail-glass" />
-      <div className="rail-track" ref={trackRef} style={{top: RULER_INSET_TOP}}>
-        {TICKS.map(v => (
-          <div key={v} className={tickClass(v)} style={{top: `${v}%`}}>
-            {v % 10 === 0 && <span className="rail-label">{v}</span>}
-          </div>
+    <div className="section-rail" ref={rootRef}>
+      {/* Keyboard / screen-reader version of the jump targets below.
+          Hidden until one of its links gets focus. */}
+      <nav className="rail-skip" aria-label="Jump to section">
+        {visibleSections.map(section => (
+          <a key={section.key} href={`#${section.domId}`}>
+            {section.label}
+          </a>
         ))}
-      </div>
-      <div className="rail-reading" ref={readingRef} />
+      </nav>
 
-      <div className="rail-titles">
-        {visibleSections.map((section, s) => (
-          <div
-            key={section.key}
-            className="rail-title"
-            data-state="upcoming"
-            ref={el => (groupRefs.current[s] = el)}
-          >
-            {Array.from(section.label.toUpperCase()).map((ch, i) => (
-              <span
-                key={i}
-                className="rail-letter"
-                ref={el => (letterRefs.current[s][i] = el)}
-                onClick={() => jumpTo(section.domId)}
-              >
-                {ch}
-              </span>
-            ))}
-          </div>
-        ))}
+      <div className="rail-visual" aria-hidden="true">
+        <div className="rail-glass" />
+        <div
+          className="rail-track"
+          ref={trackRef}
+          style={{top: RULER_INSET_TOP}}
+        >
+          {TICKS.map(v => (
+            <div key={v} className={tickClass(v)} style={{top: `${v}%`}}>
+              {v % 10 === 0 && <span className="rail-label">{v}</span>}
+            </div>
+          ))}
+        </div>
+        <div className="rail-reading" ref={readingRef} />
+
+        <div className="rail-titles">
+          {visibleSections.map((section, s) => (
+            <div
+              key={section.key}
+              className="rail-title"
+              data-state="upcoming"
+              ref={el => (groupRefs.current[s] = el)}
+            >
+              {Array.from(section.label.toUpperCase()).map((ch, i) => (
+                <span
+                  key={i}
+                  className="rail-letter"
+                  ref={el => (letterRefs.current[s][i] = el)}
+                  onClick={() => jumpTo(section.domId)}
+                >
+                  {ch}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

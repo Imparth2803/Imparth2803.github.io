@@ -9,6 +9,52 @@
   color: $ink;
 }
 
+.rail-visual {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- Keyboard section links (visible only on focus) ---------- */
+.rail-skip {
+  position: absolute;
+  top: 12px;
+  left: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+
+  a {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  a:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    padding: 4px 10px;
+    font-family: $monoFont;
+    font-size: 13px;
+    color: $ink;
+    background: $paper;
+    border: 1px solid $accent1;
+    outline: 2px solid $accent1;
+    outline-offset: 2px;
+  }
+}
+.dark-mode .rail-skip a:focus {
+  color: $textColorDark;
+  background: $darkBackground;
+  border-color: $accentLight;
+  outline-color: $accentLight;
+}
+
 /* ---------- Ruler (mirror of the right-hand one) ---------- */
 .rail-glass {
   position: absolute;
