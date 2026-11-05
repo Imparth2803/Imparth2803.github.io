@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Parth Tawde</title>
+    <!-- GitHub Pages serves this file for any path it doesn't have a file for
+         (e.g. /blog/my-post). Remember the requested path and load the app,
+         which restores it (see the script in index.html) and routes to it. -->
+    <script>
+      sessionStorage.setItem(
+        "spa-redirect",
+        location.pathname + location.search + location.hash
+      );
+      location.replace("/");
+    </script>
+  </head>
+  <body></body>
+</html>
