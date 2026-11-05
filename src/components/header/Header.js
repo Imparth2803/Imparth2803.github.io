@@ -3,6 +3,7 @@ import Headroom from "react-headroom";
 import "./Header.scss";
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 import StyleContext from "../../contexts/StyleContext";
+import {Link} from "../../utils/router";
 import {
   greeting,
   workExperiences,
@@ -27,11 +28,11 @@ function Header() {
   return (
     <Headroom>
       <header className={isDark ? "dark-menu header" : "header"}>
-        <a href="/" className="logo">
+        <Link to="/" className="logo">
           <span className="grey-color"> &lt;</span>
           <span className="logo-name">{greeting.username}</span>
           <span className="grey-color">/&gt;</span>
-        </a>
+        </Link>
         <input className="menu-btn" type="checkbox" id="menu-btn" />
         <label
           className="menu-icon"
@@ -43,41 +44,41 @@ function Header() {
         <ul className={isDark ? "dark-menu menu" : "menu"}>
           {viewSkills && (
             <li>
-              <a href="#skills">Skills</a>
+              <Link to="/#skills">Skills</Link>
             </li>
           )}
           {viewExperience && (
             <li>
-              <a href="#experience">Experience</a>
+              <Link to="/#experience">Experience</Link>
             </li>
           )}
           {viewProjects && (
             <li>
-              <a href="#projects">Projects</a>
+              <Link to="/#projects">Projects</Link>
             </li>
           )}
           {viewAchievement && (
             <li>
-              <a href="#achievements">Achievements</a>
+              <Link to="/#achievements">Achievements</Link>
             </li>
           )}
           {viewBlog && (
             <li>
-              <a href="#blogs">Blogs</a>
+              <Link to="/blog">Blog</Link>
             </li>
           )}
           {viewTalks && (
             <li>
-              <a href="#talks">Talks</a>
+              <Link to="/#talks">Talks</Link>
             </li>
           )}
           {viewResume && (
             <li>
-              <a href="#resume">Resume</a>
+              <Link to="/#resume">Resume</Link>
             </li>
           )}
           <li>
-            <a href="#contact">Contact Me</a>
+            <Link to="/#contact">Contact Me</Link>
           </li>
           <li>
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}

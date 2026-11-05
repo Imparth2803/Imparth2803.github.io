@@ -1,149 +1,106 @@
 @import "../../_globalColor";
 
-.small-dark {
-  color: $textColorDark !important;
-}
-
-.blog-container {
-  border-radius: 10px;
-  color: $blogCardContainerColor;
-  background-color: $lightBackground1;
-  box-shadow: 0 0 36px $lightBoxShadow;
-  cursor: pointer;
-  height: 200px;
-}
-
-.blog-title {
-  color: $blogCardTitleColor;
-  font-size: 1.375rem;
-  line-height: 24px;
-  font-weight: 700;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 14px;
-  margin-top: 32px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.small {
-  font-size: 1.063rem;
-  font-weight: 400;
-  line-height: 1.5rem;
-  color: $cardSubtitle;
-  padding: 0px 20px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  margin: 0px;
-}
-
-.go-corner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  top: 0;
-  right: 0;
-  background-color: $buttonColor;
-  border-radius: 0 4px 0 32px;
-}
-
-.go-arrow {
-  margin-top: -4px;
-  margin-right: -4px;
-  color: $textColorDark;
-  font-family: courier, sans;
-}
-
-.blog-card {
-  display: block;
+.post-card {
   position: relative;
-  background-color: transparent;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 48px 24px 24px;
+  border: 1px solid $hairline;
+  background-color: $lightBackground1;
+  color: $inkSoft;
   text-decoration: none;
-  z-index: 0;
-  overflow: hidden;
-  height: 100%;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.post-card:hover,
+.post-card:focus-visible {
+  border-color: $accent1;
+  transform: translateY(-2px);
+}
+.post-card:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
 }
 
-.blog-card::before {
-  content: "";
+.post-card-meta {
+  font-family: $monoFont;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $inkMuted;
+}
+.post-card-dot {
+  margin: 0 8px;
+}
+.post-card-draft {
+  margin-left: 10px;
+  padding: 1px 6px;
+  border: 1px solid $accent2;
+  color: $accent2;
+}
+
+.post-card-title {
+  margin: 0;
+  font-size: 1.375rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: $ink;
+}
+
+.post-card-summary {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: $inkSoft;
+}
+
+.post-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.post-card-tag {
+  padding: 2px 8px;
+  border: 1px solid $hairline;
+  font-family: $monoFont;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $inkSoft;
+}
+
+.post-card-arrow {
   position: absolute;
-  z-index: -1;
-  top: -16px;
-  right: -16px;
-  background: $buttonColor;
-  height: 32px;
-  width: 32px;
-  border-radius: 32px;
-  transform: scale(1);
-  transform-origin: 50% 50%;
-  transition: transform 0.4s ease-out;
+  top: 22px;
+  right: 22px;
+  font-size: 18px;
+  color: $inkMuted;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.post-card:hover .post-card-arrow {
+  color: $accent1;
+  transform: translateX(3px);
 }
 
-.blog-card:hover::before {
-  transform: scale(30);
+/* Dark theme */
+.app-root.dark-mode .post-card {
+  border-color: $hairlineDark;
+  background-color: $darkBackground;
+  color: $inkSoftDark;
 }
-
-.blog-card:hover > .small {
-  transition: all 0.3s ease-out;
-  color: $blogCardHoverSmallColor;
+.app-root.dark-mode .post-card:hover {
+  border-color: $accentLight;
 }
-
-.blog-card:hover > h3 {
-  transition: all 0.3s ease-out;
-  color: $darkBoxShadow2;
+.dark-mode .post-card-title {
+  color: $textColorDark;
 }
-
-@media screen and (max-width: 480px) and (min-width: 300px),
-  (min-width: 925px) and (max-width: 1024px),
-  (min-width: 1405px) and (max-width: 1550px) {
-  .blog-card:hover::before {
-    transform: scale(30);
-  }
+.dark-mode .post-card-summary,
+.dark-mode .post-card-tag {
+  color: $inkSoftDark;
 }
-
-@media screen and (min-width: 481px) and (max-width: 675px),
-  (min-width: 1025px) and (max-width: 1404px),
-  (min-width: 1551px) {
-  .blog-card:hover::before {
-    transform: scale(40);
-  }
-  .blog-card::before {
-    transition: transform 0.45s ease-out;
-  }
+.dark-mode .post-card-tag {
+  border-color: $hairlineDark;
 }
-
-@media screen and (min-width: 675px) and (max-width: 860px) {
-  .blog-card:hover::before {
-    transform: scale(50);
-  }
-  .blog-card::before {
-    transition: transform 0.5s ease-out;
-  }
-}
-
-@media screen and (min-width: 860px) and (max-width: 924px) {
-  .blog-card:hover::before {
-    transform: scale(60);
-  }
-  .blog-card::before {
-    transition: transform 0.5s ease-out;
-  }
-}
-
-@media screen and (max-width: 480px) and (min-width: 300px) {
-  .blog-title {
-    font-size: 1.125rem;
-  }
-}
-.blog-card-shadow {
-  box-shadow: 1px 0px 20px $darkBoxShadow2;
+.dark-mode .post-card-meta {
+  color: $inkMutedDark;
 }

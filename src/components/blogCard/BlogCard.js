@@ -1,36 +1,34 @@
 import React from "react";
 import "./BlogCard.scss";
+import {Link} from "../../utils/router";
+import {formatDate} from "../../blog/posts";
 
-export default function BlogCard({blog, isDark}) {
-  function openUrlInNewTab(url, name) {
-    if (!url) {
-      console.log(`URL for ${name} not found`);
-      return;
-    }
-    var win = window.open(url, "_blank");
-    win.focus();
-  }
-
+export default function BlogCard({post, isDark}) {
   return (
-    <div onClick={() => openUrlInNewTab(blog.url, blog.title)}>
-      <div className={isDark ? "blog-container dark-mode" : "blog-container"}>
-        <a
-          className={
-            isDark ? "dark-mode blog-card blog-card-shadow" : "blog-card"
-          }
-          href="#blog"
-        >
-          <h3 className={isDark ? "small-dark blog-title" : "blog-title"}>
-            {blog.title}
-          </h3>
-          <p className={isDark ? "small-dark small" : "small"}>
-            {blog.description}
-          </p>
-          <div className="go-corner">
-            <div className="go-arrow">→</div>
-          </div>
-        </a>
-      </div>
-    </div>
+    <Link
+      to={`/blog/${post.slug}`}
+      className={isDark ? "post-card dark-mode" : "post-card"}
+    >
+      <span className="post-card-meta">
+        {formatDate(post.date)}
+        <span className="post-card-dot">·</span>
+        {post.readingMinutes} min read
+        {post.draft && <span className="post-card-draft">Draft</span>}
+      </span>
+      <h3 className="post-card-title">{post.title}</h3>
+      {post.summary && <p className="post-card-summary">{post.summary}</p>}
+      {post.tags.length > 0 && (
+        <span className="post-card-tags">
+          {post.tags.map(tag => (
+            <span key={tag} className="post-card-tag">
+              {tag}
+            </span>
+          ))}
+        </span>
+      )}
+      <span className="post-card-arrow" aria-hidden="true">
+        →
+      </span>
+    </Link>
   );
 }

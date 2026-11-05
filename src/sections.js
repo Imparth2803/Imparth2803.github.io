@@ -8,7 +8,8 @@ import {
   workExperiences,
   bigProjects,
   openSource,
-  achievementSection
+  achievementSection,
+  blogSection
 } from "./portfolio";
 
 const sections = [
@@ -41,6 +42,12 @@ const sections = [
     label: "Achievements",
     caption: "Publications & awards",
     show: achievementSection.display
+  },
+  {
+    key: "blog",
+    label: "Writing",
+    caption: "Latest posts",
+    show: blogSection.display
   },
   {
     key: "contact",
