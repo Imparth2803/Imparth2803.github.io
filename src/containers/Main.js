@@ -19,6 +19,8 @@ import SectionBlock from "../components/sectionBar/SectionBar";
 import Twitter from "./twitter-embed/twitter";
 import Profile from "./profile/Profile";
 import SplashScreen from "./splashScreen/SplashScreen";
+import {BlogIndex, BlogPost, NotFound} from "./blogPage/BlogPage";
+import {useLocation, matchRoute} from "../utils/router";
 import {splashScreen} from "../portfolio";
 import {StyleProvider} from "../contexts/StyleContext";
 import {useLocalStorage} from "../hooks/useLocalStorage";
@@ -28,11 +30,25 @@ import "../theme.scss";
 const Main = () => {
   const darkPref = window.matchMedia("(prefers-color-scheme: dark)");
   const [isDark, setIsDark] = useLocalStorage("isDark", darkPref.matches);
-  const [isShowingSplashAnimation, setIsShowingSplashAnimation] =
-    useState(true);
+  const {path, hash} = useLocation();
+  const route = matchRoute(path);
+  // The splash animation only plays when the site is opened on the homepage
+  const [isShowingSplashAnimation, setIsShowingSplashAnimation] = useState(
+    () => matchRoute(window.location.pathname).name === "home"
+  );
+
+  // After switching pages, jump to the requested section or the top
+  useEffect(() => {
+    const target = hash && document.getElementById(hash.slice(1));
+    if (target) {
+      target.scrollIntoView();
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [path, hash, isShowingSplashAnimation]);
 
   useEffect(() => {
-    if (splashScreen.enabled) {
+    if (splashScreen.enabled && isShowingSplashAnimation) {
       const splashTimer = setTimeout(
         () => setIsShowingSplashAnimation(false),
         splashScreen.duration
@@ -41,7 +57,7 @@ const Main = () => {
         clearTimeout(splashTimer);
       };
     }
-  }, []);
+  }, [isShowingSplashAnimation]);
 
   const changeTheme = () => {
     setIsDark(!isDark);
@@ -55,6 +71,15 @@ const Main = () => {
       <StyleProvider value={{isDark: isDark, changeTheme: changeTheme}}>
         {isShowingSplashAnimation && splashScreen.enabled ? (
           <SplashScreen />
+        ) : route.name !== "home" ? (
+          <>
+            <Header />
+            {route.name === "blogIndex" && <BlogIndex />}
+            {route.name === "blogPost" && <BlogPost slug={route.slug} />}
+            {route.name === "notFound" && <NotFound />}
+            <Footer />
+            <ScrollToTopButton />
+          </>
         ) : (
           <>
             <Header />
@@ -76,7 +101,9 @@ const Main = () => {
             <SectionBlock sectionKey="achievements">
               <Achievement />
             </SectionBlock>
-            <Blogs />
+            <SectionBlock sectionKey="blog">
+              <Blogs />
+            </SectionBlock>
             <Talks />
             <Twitter />
             <Podcast />

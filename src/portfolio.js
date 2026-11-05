@@ -313,12 +313,13 @@ const achievementSection = {
 
 // Blogs Section
 
+// Posts are Markdown files in src/blog/posts/ (see src/blog/posts.js).
+// The full list lives at /blog and each post at /blog/<file-name>.
 const blogSection = {
-  title: "Blogs",
-  subtitle: "Things I have written about.",
-  displayMediumBlogs: "true", // Set true to display fetched medium blogs instead of hardcoded ones
-  blogs: [],
-  display: false // Set true once MEDIUM_USERNAME is set in .github/workflows/deploy.yml
+  title: "Blog",
+  subtitle: "Notes on Python, AI, computer vision and the things I build.",
+  postsOnHomepage: 3, // How many of the latest posts the homepage shows
+  display: true // Set false to hide the blog section and the Blog menu link
 };
 
 // Talks Sections
