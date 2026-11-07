@@ -10,6 +10,7 @@ import {
 } from "../logic/watermark";
 import {ColourInput} from "./ColourInput";
 import {SliderField} from "./SliderField";
+import {FieldGroup} from "./FieldGroup";
 
 export interface LogoInfo {
   name: string;
@@ -66,7 +67,7 @@ export function WatermarkPanel({
   );
 
   const kindChoice = (
-    <Field label="Watermark">
+    <FieldGroup label="Watermark">
       <div className="editor-button-grid" role="group" aria-label="Watermark">
         {(["none", "text", "logo"] as const).map(k => (
           <button
@@ -82,7 +83,7 @@ export function WatermarkPanel({
           </button>
         ))}
       </div>
-    </Field>
+    </FieldGroup>
   );
 
   if (!w) {

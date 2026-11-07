@@ -451,6 +451,299 @@
   overflow-wrap: anywhere;
 }
 
+/* "Edit one image" / "Make a collage". */
+.editor-modes {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid $hairline;
+  border-radius: 8px;
+  overflow: hidden;
+
+  button {
+    padding: 8px 14px;
+    border: none;
+    background: none;
+    color: $inkSoft;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button + button {
+    border-left: 1px solid $hairline;
+  }
+  button[aria-pressed="true"] {
+    background-color: $accent1;
+    color: #ffffff;
+  }
+  button:focus-visible {
+    outline: 2px solid $accent1;
+    outline-offset: -2px;
+  }
+}
+
+/* Colour picker */
+.editor-picker-surface {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+
+  &:focus-visible {
+    outline: 2px solid $accent1;
+  }
+}
+.editor-picker-cross {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  margin: -7px 0 0 -7px;
+  pointer-events: none;
+  display: none;
+  background: linear-gradient(#fff, #fff) center / 1px 100% no-repeat,
+    linear-gradient(#fff, #fff) center / 100% 1px no-repeat;
+  filter: drop-shadow(0 0 1px #000);
+}
+.editor-picker-surface:focus-visible .editor-picker-cross {
+  display: block;
+}
+.editor-picker-lens {
+  position: absolute;
+  width: 88px;
+  height: 88px;
+  pointer-events: none;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  image-rendering: pixelated;
+}
+.editor-picked {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.editor-picked-swatch {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 1px solid $hairline;
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%);
+}
+.editor-picked-values {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  div {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 6px;
+    align-items: center;
+  }
+  dt {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  dd {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  output {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: $ink;
+    overflow-wrap: anywhere;
+  }
+  .tool-button {
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+}
+.editor-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.editor-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid $hairline;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid $accent1;
+    outline-offset: 1px;
+  }
+}
+.editor-palette {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+  }
+}
+
+/* Photo details */
+.editor-meta-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+
+  div {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid $hairline;
+  }
+  dt {
+    font-weight: 600;
+  }
+  dd {
+    margin: 0;
+    color: $ink;
+    overflow-wrap: anywhere;
+  }
+  dd.tool-muted {
+    color: $inkSoft;
+  }
+}
+
+/* Collage */
+.editor-collage {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: start;
+}
+.editor-collage-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.editor-collage-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  h2 {
+    margin: 0;
+    font-size: 16px;
+    color: $ink;
+  }
+}
+.editor-collage-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.editor-collage-card {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid $hairline;
+  border-radius: 8px;
+  cursor: grab;
+
+  img {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+}
+.editor-collage-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.editor-collage-name {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.editor-collage-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  button {
+    padding: 2px 6px;
+    border: 1px solid $hairline;
+    border-radius: 4px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+.editor-collage-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.editor-collage-canvas {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid $hairline;
+  background-color: #f3f4f6;
+  background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%);
+  background-size: 16px 16px;
+
+  canvas {
+    max-width: 100%;
+    max-height: 70vh;
+    height: auto;
+  }
+}
+.editor-collage .editor-panel h2 + .editor-panel-body {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1100px) {
+  .editor-collage {
+    grid-template-columns: 1fr;
+  }
+  .editor-collage-list {
+    max-height: none;
+  }
+}
+
 .dark-mode {
   .editor {
     color: $inkSoftDark;
@@ -460,6 +753,33 @@
   }
   .editor-reset-one {
     color: $accentLight;
+  }
+  .editor-modes,
+  .editor-modes button + button,
+  .editor-meta-list div,
+  .editor-collage-card,
+  .editor-collage-card-actions button,
+  .editor-collage-canvas,
+  .editor-swatch,
+  .editor-picked-swatch {
+    border-color: $hairlineDark;
+  }
+  .editor-modes button {
+    color: $inkSoftDark;
+  }
+  .editor-modes button[aria-pressed="true"] {
+    background-color: $accentLight;
+    color: $darkBackground;
+  }
+  .editor-meta-list dd,
+  .editor-picked-values output,
+  .editor-collage-items h2 {
+    color: $textColorDark;
+  }
+  .editor-collage-canvas {
+    background-color: #1f2937;
+    background-image: linear-gradient(45deg, #374151 25%, transparent 25%),
+      linear-gradient(-45deg, #374151 25%, transparent 25%);
   }
   .editor-reset-one:disabled {
     color: $inkSoftDark;

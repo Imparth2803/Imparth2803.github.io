@@ -17,7 +17,25 @@ export interface SaveSettings {
   background: string;
   /** Without the extension. */
   name: string;
+  /** JPG only: copy the original's camera details (never the location). */
+  keepCamera?: boolean;
 }
+
+/** What Save makes: the file, its size, and (for JPG) whether the camera
+    details were copied. */
+export interface MadeFile {
+  blob: Blob;
+  width: number;
+  height: number;
+  camera?: "kept" | "none" | "damaged" | "too-big" | null;
+}
+
+export type RenderFile = (settings: {
+  format: ImageType;
+  /** 0–1. */
+  quality: number;
+  background: string;
+}) => Promise<MadeFile>;
 
 export const DEFAULT_QUALITY: Record<ImageType, number> = {
   jpeg: 92,
@@ -39,23 +57,28 @@ export function SavePanel({
   onSettings,
   webpOk,
   seeThrough,
-  sourceType
+  sourceType,
+  hasCameraDetails = false,
+  render
 }: {
   client: WorkerClient<ImageEditorApi>;
-  edits: Edits;
+  /** The edits to save (not used when `render` is given). */
+  edits?: Edits;
   settings: SaveSettings;
   onSettings: (settings: SaveSettings) => void;
   webpOk: boolean;
   /** Whether the result has see-through areas. */
   seeThrough: boolean;
   sourceType?: InputType;
+  /** Whether the original has camera details that could be kept. */
+  hasCameraDetails?: boolean;
+  /** Makes the file some other way (the collage uses this). */
+  render?: RenderFile;
 }) {
   const {format, quality, background} = settings;
-  const [made, setMade] = useState<{
-    blob: Blob;
-    width: number;
-    height: number;
-  } | null>(null);
+  const [made, setMade] = useState<MadeFile | null>(null);
+  const keepCamera =
+    !render && hasCameraDetails && format === "jpeg" && !!settings.keepCamera;
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,25 +86,32 @@ export function SavePanel({
     setMade(null);
     setError(null);
     const timer = setTimeout(() => {
-      client
-        .call("save", {edits, format, quality: quality / 100, background})
-        .then(
-          result => current && setMade(result),
-          e => {
-            if (!current || e instanceof CancelledError) return;
-            setError(
-              e instanceof ToolError
-                ? e.message
-                : "The file couldn't be made. Try another file type."
-            );
-          }
-        );
+      (render
+        ? render({format, quality: quality / 100, background})
+        : client.call("save", {
+            edits: edits!,
+            format,
+            quality: quality / 100,
+            background,
+            keepCamera
+          })
+      ).then(
+        result => current && setMade(result),
+        e => {
+          if (!current || e instanceof CancelledError) return;
+          setError(
+            e instanceof ToolError
+              ? e.message
+              : "The file couldn't be made. Try another file type."
+          );
+        }
+      );
     }, 350);
     return () => {
       current = false;
       clearTimeout(timer);
     };
-  }, [client, edits, format, quality, background]);
+  }, [client, edits, format, quality, background, keepCamera, render]);
 
   const fileName = `${cleanName(settings.name)}.${IMAGE_TYPES[format].ext}`;
   const lossy = format !== "png";
@@ -156,6 +186,30 @@ export function SavePanel({
         </>
       )}
 
+      {!render && hasCameraDetails && format === "jpeg" && (
+        <label className="editor-checkbox-row">
+          <input
+            type="checkbox"
+            checked={!!settings.keepCamera}
+            onChange={e =>
+              onSettings({...settings, keepCamera: e.target.checked})
+            }
+          />
+          <span>Keep camera details (without location)</span>
+        </label>
+      )}
+      {made?.camera === "too-big" && (
+        <Notice tone="warning">
+          The camera details are too large to copy into a JPG, so they were left
+          out.
+        </Notice>
+      )}
+      {made?.camera === "damaged" && (
+        <Notice tone="warning">
+          The original's camera details are damaged, so they were left out.
+        </Notice>
+      )}
+
       <div className="tool-field">
         <label className="tool-field-label" htmlFor="editor-file-name">
           File name
@@ -197,7 +251,10 @@ export function SavePanel({
           ? `${IMAGE_TYPES[format].label} saves some detail away to make the file smaller.`
           : "PNG keeps every pixel exactly as shown."}{" "}
         The saved file is a new image: your original isn't changed, and photo
-        details such as the camera and location aren't copied into it.
+        details such as the camera and location aren't copied into it
+        {made?.camera === "kept"
+          ? " (except the camera details you chose to keep; never the location)."
+          : "."}
       </p>
     </div>
   );

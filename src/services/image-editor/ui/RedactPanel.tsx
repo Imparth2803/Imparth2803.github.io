@@ -1,7 +1,8 @@
 import React from "react";
-import {Field, Notice} from "../../../shared/ui/ToolStep";
+import {Notice} from "../../../shared/ui/ToolStep";
 import {NO_REDACTIONS, Redaction} from "../logic/edits";
 import {ColourInput} from "./ColourInput";
+import {FieldGroup} from "./FieldGroup";
 
 export const REDACT_WARNING =
   "Blur and pixelation can sometimes be reversed. For passwords, ID numbers, addresses and other private details, use a solid box.";
@@ -69,7 +70,7 @@ export function RedactPanel({
         <ol className="editor-redaction-list">
           {redactions.map((r, i) => (
             <li key={r.id}>
-              <Field label={`Hidden area ${i + 1}`}>
+              <FieldGroup label={`Hidden area ${i + 1}`}>
                 <div className="editor-slider-row">
                   <select
                     className="tool-select"
@@ -104,7 +105,7 @@ export function RedactPanel({
                     <i className="fas fa-trash-alt" aria-hidden="true"></i>
                   </button>
                 </div>
-              </Field>
+              </FieldGroup>
             </li>
           ))}
         </ol>

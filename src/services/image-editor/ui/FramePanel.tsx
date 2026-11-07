@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import {formatCount} from "../../../shared/text/numbers";
-import {Field, Notice} from "../../../shared/ui/ToolStep";
+import {Notice} from "../../../shared/ui/ToolStep";
 import {Frame, framedSize, isFramed} from "../logic/frame";
 import {ColourInput} from "./ColourInput";
+import {FieldGroup} from "./FieldGroup";
 
 type Side = "top" | "right" | "bottom" | "left";
 const SIDES: {id: Side; label: string}[] = [
@@ -227,7 +228,7 @@ export function FramePanel({
         </div>
       )}
 
-      <Field label="Padding background">
+      <FieldGroup label="Padding background">
         <div className="editor-slider-row">
           <label className="editor-checkbox-row">
             <input
@@ -256,7 +257,7 @@ export function FramePanel({
             />
           )}
         </div>
-      </Field>
+      </FieldGroup>
 
       {refused ? (
         <Notice tone="error">

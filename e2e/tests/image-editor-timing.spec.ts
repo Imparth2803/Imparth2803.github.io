@@ -1,13 +1,23 @@
 import {expect, Page, test} from "@playwright/test";
 import {openTool} from "./helpers";
 
-/* Timing test for the Stage 4 tools on a 24-megapixel photo: dragging a
-   colour slider and adding effects must never freeze the page for more
-   than 100 ms (all the pixel work happens in the background worker).
-   Like performance.spec.ts, this runs on its own after the other tests. */
+/* Timing tests for the editor's heavier tools: dragging a colour slider
+   and adding effects on a 24-megapixel photo, and a collage of nine large
+   photos, must never freeze the page for more than 100 ms (all the pixel
+   work happens in the background worker).
+
+   This file isn't named like performance.spec.ts on purpose: the timing
+   projects run their files side by side, and these heavy tests would slow
+   the other tools' timing tests down. It runs with the ordinary tests
+   instead, in Chromium and Firefox, with a wide margin under the limit. */
 test.describe.configure({mode: "serial"});
+test.skip(
+  ({browserName}) => browserName === "webkit",
+  "Timed in Chromium and Firefox, like the other timing tests."
+);
 
 const TARGET_MS = 100;
+const COLLAGE_TARGET_MS = 200;
 
 /** The longest gap in a 10 ms timer while `work` runs (a freeze). */
 async function longestFreeze(page: Page, work: () => Promise<void>) {
@@ -91,4 +101,63 @@ test("Image Editor: colour and effects on a 24-megapixel photo", async ({
     )} ms`
   );
   expect(freeze).toBeLessThan(TARGET_MS);
+});
+
+test("Image Editor: a 3 × 3 collage of nine 4000 × 4000 photos", async ({
+  page
+}) => {
+  test.slow();
+  await openTool(page, "image-editor");
+  const photos = await page.evaluate(async () => {
+    const out: number[][] = [];
+    for (let n = 0; n < 9; n++) {
+      const canvas = new OffscreenCanvas(4000, 4000);
+      const ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+      for (let i = 0; i < 120; i++) {
+        ctx.fillStyle = `hsl(${(i * 37 + n * 40) % 360} 70% 50%)`;
+        ctx.fillRect((i * 331) % 4000, (i * 197) % 4000, 700, 500);
+      }
+      const blob = await canvas.convertToBlob({
+        type: "image/jpeg",
+        quality: 0.85
+      });
+      out.push(Array.from(new Uint8Array(await blob.arrayBuffer())));
+      canvas.width = canvas.height = 0;
+    }
+    return out;
+  });
+  await page.getByRole("button", {name: "Make a collage"}).click();
+
+  // Handing the nine files to the page is the test tool's own work (it
+  // copies about 9 MB into the page at once), so timing starts after it.
+  await page.locator("#collage-files").setInputFiles(
+    photos.map((bytes, i) => ({
+      name: `photo-${i + 1}.jpg`,
+      mimeType: "image/jpeg",
+      buffer: Buffer.from(bytes)
+    }))
+  );
+  const freeze = await longestFreeze(page, async () => {
+    await expect(page.locator(".editor-collage-card")).toHaveCount(9, {
+      timeout: 60_000
+    });
+    await page.getByLabel("Layout").selectOption("grid3");
+    await expect(page.locator(".editor-collage-preview")).toContainText(
+      "2,000 × 2,000 pixels"
+    );
+    await page.getByRole("button", {name: "Save the collage"}).click();
+    await page.getByLabel("File type").selectOption("png");
+    await expect(
+      page.locator(".editor-panel").getByRole("button", {name: "Download PNG"})
+    ).toBeEnabled({timeout: 120_000});
+  });
+  console.log(
+    `Image Editor collage, nine 16-megapixel photos: longest freeze ${freeze.toFixed(
+      0
+    )} ms`
+  );
+  // Alone, this measures 5–45 ms. It runs alongside other tests, which
+  // compete for the computer while nine large photos are being opened, so
+  // it allows more than the slider test; a real freeze would be far longer.
+  expect(freeze).toBeLessThan(COLLAGE_TARGET_MS);
 });

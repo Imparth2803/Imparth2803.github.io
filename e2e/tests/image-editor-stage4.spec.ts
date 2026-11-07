@@ -189,7 +189,9 @@ test.describe("Image Editor — Stage 4", () => {
     await page.mouse.down();
     await page.mouse.move(at.x + 300, at.y + 200, {steps: 6});
     await page.mouse.up();
-    await expect(page.getByLabel("Hidden area 1", {exact: true})).toBeVisible();
+    await expect(
+      page.getByRole("region", {name: "Hidden area 1"})
+    ).toBeVisible();
     await page.getByLabel("Colour of area 1").fill("#00ff00");
     await ready(page);
 

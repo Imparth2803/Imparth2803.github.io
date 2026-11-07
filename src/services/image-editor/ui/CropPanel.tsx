@@ -3,6 +3,7 @@ import {formatCount} from "../../../shared/text/numbers";
 import {Field} from "../../../shared/ui/ToolStep";
 import {Crop} from "../logic/edits";
 import {centreCrop, clampRect, Rect, Size} from "../logic/geometry";
+import {FieldGroup} from "./FieldGroup";
 
 export const CROP_PRESETS = [
   {id: "free", label: "Free", ratio: null},
@@ -87,7 +88,7 @@ export function CropPanel({
 
   return (
     <div className="editor-panel-body">
-      <Field label="Shape">
+      <FieldGroup label="Shape">
         <div
           className="editor-button-grid"
           role="group"
@@ -111,7 +112,7 @@ export function CropPanel({
             <i className="far fa-circle" aria-hidden="true"></i> Circle
           </button>
         </div>
-      </Field>
+      </FieldGroup>
 
       <Field label="Aspect ratio">
         <select

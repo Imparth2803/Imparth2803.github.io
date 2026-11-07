@@ -37,14 +37,20 @@ import {
   transformedSize,
   withEarlierChange
 } from "../logic/edits";
+import type {Rgba} from "../logic/colour";
 import {Size} from "../logic/geometry";
 import {commit, History, redo, start, undo} from "../logic/history";
 import type {ImageEditorApi} from "../worker/imageEditor.worker";
 import {AdjustPanel} from "./AdjustPanel";
 import {BoxEditor} from "./BoxEditor";
+import {checkFile, TYPE_NAMES} from "./checkFile";
+import {CollageMode} from "./CollageMode";
 import {CropDraft, CropPanel, ratioOf} from "./CropPanel";
 import {EffectsPanel} from "./EffectsPanel";
 import {FramePanel} from "./FramePanel";
+import {MetadataPanel} from "./MetadataPanel";
+import {PickerOverlay} from "./PickerOverlay";
+import {addRecent, PickerPanel} from "./PickerPanel";
 import {RedactOverlay} from "./RedactOverlay";
 import {newRedaction, RedactPanel} from "./RedactPanel";
 import {DEFAULT_QUALITY, SavePanel, SaveSettings} from "./SavePanel";
@@ -68,12 +74,13 @@ const TOOLS = [
   {id: "redact", label: "Hide areas", icon: "fas fa-eye-slash"},
   {id: "watermark", label: "Watermark", icon: "fas fa-stamp"},
   {id: "frame", label: "Border & padding", icon: "fas fa-border-all"},
+  {id: "picker", label: "Colour picker", icon: "fas fa-eye-dropper"},
+  {id: "metadata", label: "Photo details", icon: "fas fa-info-circle"},
   {id: "save", label: "Save", icon: "fas fa-download"}
 ] as const;
 type ToolId = (typeof TOOLS)[number]["id"];
 
 const ALL_EXTENSIONS = Object.values(INPUT_TYPES).flatMap(t => t.exts);
-const TYPE_NAMES = "JPG, PNG, WebP, GIF, BMP or AVIF";
 
 interface OpenImage {
   file: File;
@@ -117,6 +124,16 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
     name: "image"
   });
   const fileInput = useRef<HTMLInputElement>(null);
+  /** "Edit one image" or "Make a collage". */
+  const [mode, setMode] = useState<"edit" | "collage">("edit");
+  const [collageCount, setCollageCount] = useState(0);
+  /** Whether the opened file has camera details that Save could keep. */
+  const [hasCamera, setHasCamera] = useState(false);
+  // Colour picker: the picked colour, recent ones, and the main colours.
+  const [pickerReady, setPickerReady] = useState(false);
+  const [picked, setPicked] = useState<Rgba | null>(null);
+  const [recent, setRecent] = useState<Rgba[]>([]);
+  const [mainColours, setMainColours] = useState<string[] | null>(null);
 
   useEffect(() => {
     client
@@ -153,7 +170,7 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
 
   // Ctrl+Z / Cmd+Z to undo; with Shift (or Ctrl+Y) to redo.
   useEffect(() => {
-    if (!image) return;
+    if (!image || mode !== "edit") return;
     const onKey = (e: KeyboardEvent) => {
       if (!(e.ctrlKey || e.metaKey)) return;
       const target = e.target as HTMLElement;
@@ -167,7 +184,26 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [image, back, forward]);
+  }, [image, mode, back, forward]);
+
+  // The colour picker reads from the edited image at full size, drawn once
+  // when the tool opens (and again after Undo or Redo).
+  const pickFrom = history.present;
+  const picking = tool === "picker" && mode === "edit" && image !== null;
+  useEffect(() => {
+    if (!picking) return;
+    let current = true;
+    setMainColours(null);
+    client.call("pickerStart", {edits: pickFrom}).then(
+      () => current && setPickerReady(true),
+      () => current && setPickerReady(false)
+    );
+    return () => {
+      current = false;
+      setPickerReady(false);
+      client.call("pickerEnd", undefined).catch(() => undefined);
+    };
+  }, [picking, pickFrom, client]);
 
   const open = async (file: File) => {
     if (
@@ -199,6 +235,14 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
       // The worker closes the logos when a new image opens.
       setLogos(new Map());
       setLogoError(null);
+      setPicked(null);
+      setRecent([]);
+      setMainColours(null);
+      setHasCamera(false);
+      client.call("metadata", undefined).then(
+        m => setHasCamera(m.ranges.tiff !== null && m.status === "found"),
+        () => setHasCamera(false)
+      );
       setZoom("fit");
       setShowOriginal(false);
       setTool("transform");
@@ -290,9 +334,57 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
     />
   );
 
+  const modeSwitch = (
+    <div className="editor-modes" role="group" aria-label="What to make">
+      {(
+        [
+          ["edit", "Edit one image", "fas fa-image"],
+          ["collage", "Make a collage", "fas fa-th-large"]
+        ] as const
+      ).map(([id, label, icon]) => (
+        <button
+          key={id}
+          type="button"
+          aria-pressed={mode === id}
+          onClick={() => {
+            if (
+              mode === "collage" &&
+              id === "edit" &&
+              collageCount > 0 &&
+              !window.confirm(
+                "Leave the collage? Its pictures will be cleared (your image edits are kept)."
+              )
+            )
+              return;
+            setMode(id);
+          }}
+        >
+          <i className={icon} aria-hidden="true"></i> {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (mode === "collage") {
+    return (
+      <div className="editor">
+        {modeSwitch}
+        <CollageMode
+          client={client}
+          maxMB={maxMB}
+          maxMP={maxMP}
+          maxItems={small ? 12 : 25}
+          webpOk={webpOk}
+          onCount={setCollageCount}
+        />
+      </div>
+    );
+  }
+
   if (!image) {
     return (
       <div className="editor editor-empty">
+        {modeSwitch}
         <DropZone
           inputId="editor-files"
           accept={ALL_EXTENSIONS}
@@ -374,6 +466,7 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
 
   return (
     <div className="editor">
+      {modeSwitch}
       {picker}
       <div className="editor-topbar">
         <span className="editor-file" title={image.file.name}>
@@ -526,6 +619,17 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
                 onPreview={watermark => setDraft({...edits, watermark})}
               />
             )}
+            {tool === "picker" && pickerReady && !showOriginal && (
+              <PickerOverlay
+                imageSize={out}
+                scale={display}
+                sample={(x, y) => client.call("sample", {x, y})}
+                onPick={s => {
+                  setPicked(s.rgba);
+                  setRecent(old => addRecent(old, s.rgba));
+                }}
+              />
+            )}
             {tool === "crop" && !showOriginal && (
               <BoxEditor
                 box={crop.box}
@@ -615,6 +719,26 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
               onReset={() => change({...edits, frame: NO_FRAME})}
             />
           )}
+          {tool === "picker" && (
+            <PickerPanel
+              picked={picked}
+              recent={recent}
+              palette={mainColours}
+              onSelect={setPicked}
+              onClearRecent={() => setRecent([])}
+              onFindPalette={() =>
+                client
+                  .call("palette", undefined)
+                  .then(setMainColours, () => setMainColours([]))
+              }
+              onRemoveFromPalette={hex =>
+                setMainColours(old => old?.filter(x => x !== hex) ?? null)
+              }
+            />
+          )}
+          {tool === "metadata" && (
+            <MetadataPanel client={client} fileName={image.file.name} />
+          )}
           {tool === "save" && (
             <SavePanel
               client={client}
@@ -624,6 +748,7 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
               webpOk={webpOk}
               seeThrough={image.seeThrough || addsEmptyAreas(history.present)}
               sourceType={image.type}
+              hasCameraDetails={hasCamera}
             />
           )}
         </aside>
@@ -663,31 +788,3 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
 /** Which image size and crop a crop draft belongs to. */
 const keyFor = (bounds: Size, crop: Crop | null) =>
   JSON.stringify([bounds.width, bounds.height, crop]);
-
-/* Checks a file before opening it: empty, too big, not an image this tool
-   can open, or too many pixels. Returns the problem, or the file's type. */
-async function checkFile(
-  file: File,
-  maxMB: number,
-  maxMP: number
-): Promise<string | {type: InputType}> {
-  if (file.size === 0) return `“${file.name}” is empty.`;
-  if (file.size > maxMB * MB) {
-    return `“${file.name}” is ${formatBytes(
-      file.size
-    )}; this device can edit images up to ${maxMB} MB.`;
-  }
-  const header = await readFileInputHeader(file).catch(() => null);
-  if (!header) {
-    return `“${file.name}” isn't a ${TYPE_NAMES} image (or it's damaged).`;
-  }
-  const megapixels = (header.width * header.height) / 1e6;
-  if (megapixels > maxMP) {
-    return `“${file.name}” is ${formatCount(header.width)} × ${formatCount(
-      header.height
-    )} pixels (${megapixels.toFixed(
-      0
-    )} megapixels); this device can edit images up to ${maxMP} megapixels. Make it smaller with the Bulk Image Resizer first.`;
-  }
-  return {type: header.type};
-}
