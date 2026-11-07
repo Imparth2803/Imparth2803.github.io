@@ -20,6 +20,18 @@ import {renderEdits} from "./pipeline";
 let source: ImageBitmap | null = null;
 let maxMegapixels = 0;
 
+/** Logos for logo watermarks, oldest first. Edits hold only their ids. */
+const logos = new Map<string, ImageBitmap>();
+let logoCount = 0;
+const MAX_LOGOS = 5;
+const MAX_LOGO_MB = 10;
+const MAX_LOGO_MEGAPIXELS = 16;
+
+function closeLogos() {
+  logos.forEach(logo => logo.close());
+  logos.clear();
+}
+
 function opened(): ImageBitmap {
   if (!source) throw new UserError("Open an image first.");
   return source;
@@ -39,6 +51,7 @@ const handlers = {
   }) {
     source?.close();
     source = null;
+    closeLogos();
     let bitmap: ImageBitmap;
     try {
       bitmap = await decodeImage(file, file.name);
@@ -79,9 +92,45 @@ const handlers = {
     return {width: bitmap.width, height: bitmap.height, seeThrough};
   },
 
+  /** Opens a picture for a logo watermark (see-through areas are kept). */
+  async openLogo({file}: {file: File}) {
+    if (file.size > MAX_LOGO_MB * 1024 * 1024) {
+      throw new UserError(
+        `“${file.name}” is too big for a logo. Use a picture up to ${MAX_LOGO_MB} MB.`
+      );
+    }
+    const bitmap = await decodeImage(file, file.name);
+    if ((bitmap.width * bitmap.height) / 1e6 > MAX_LOGO_MEGAPIXELS) {
+      bitmap.close();
+      throw new UserError(
+        `“${file.name}” has too many pixels for a logo. Use a picture up to ${MAX_LOGO_MEGAPIXELS} megapixels.`
+      );
+    }
+    const evicted: string[] = [];
+    while (logos.size >= MAX_LOGOS) {
+      const [oldest, logo] = logos.entries().next().value as [
+        string,
+        ImageBitmap
+      ];
+      logo.close();
+      logos.delete(oldest);
+      evicted.push(oldest);
+    }
+    const logoId = `logo-${++logoCount}`;
+    logos.set(logoId, bitmap);
+    return {logoId, width: bitmap.width, height: bitmap.height, evicted};
+  },
+
   /** The preview, at a smaller scale. Handed over, not copied. */
   render({edits, scale}: {edits: Edits; scale: number}) {
-    const {canvas} = renderEdits(opened(), edits, scale, maxMegapixels, null);
+    const {canvas} = renderEdits(
+      opened(),
+      edits,
+      scale,
+      maxMegapixels,
+      null,
+      logos
+    );
     const bitmap = canvas.transferToImageBitmap();
     canvas.width = canvas.height = 0;
     return new Transfer({bitmap}, [bitmap]);
@@ -104,7 +153,8 @@ const handlers = {
       edits,
       1,
       maxMegapixels,
-      format === "jpeg" ? background : null
+      format === "jpeg" ? background : null,
+      logos
     );
     try {
       const blob = await encodeCanvas(

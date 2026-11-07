@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {downloadBlob} from "../../../shared/files/download";
-import {IMAGE_TYPES, ImageType} from "../../../shared/images/header";
+import {IMAGE_TYPES, ImageType, InputType} from "../../../shared/images/header";
 import {formatBytes} from "../../../shared/limits";
 import {formatCount} from "../../../shared/text/numbers";
 import {Field, Notice} from "../../../shared/ui/ToolStep";
@@ -38,7 +38,8 @@ export function SavePanel({
   settings,
   onSettings,
   webpOk,
-  seeThrough
+  seeThrough,
+  sourceType
 }: {
   client: WorkerClient<ImageEditorApi>;
   edits: Edits;
@@ -47,6 +48,7 @@ export function SavePanel({
   webpOk: boolean;
   /** Whether the result has see-through areas. */
   seeThrough: boolean;
+  sourceType?: InputType;
 }) {
   const {format, quality, background} = settings;
   const [made, setMade] = useState<{
@@ -109,6 +111,9 @@ export function SavePanel({
           </option>
         </select>
       </Field>
+      {sourceType === "gif" && (
+        <p className="tool-field-hint">Only the first frame is kept.</p>
+      )}
 
       {lossy && (
         <div className="tool-field">

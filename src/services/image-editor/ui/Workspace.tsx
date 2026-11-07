@@ -29,7 +29,8 @@ export function Workspace({
   height,
   zoom,
   onFitScale,
-  onBusy
+  onBusy,
+  children
 }: {
   client: WorkerClient<ImageEditorApi>;
   edits: Edits;
@@ -40,6 +41,7 @@ export function Workspace({
   /** Reports the zoom that fits the image on screen. */
   onFitScale: (scale: number) => void;
   onBusy: (busy: boolean) => void;
+  children?: React.ReactNode;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,6 +97,8 @@ export function Workspace({
           break;
         }
         // Size and picture change together, so nothing looks stretched.
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
         canvas.style.width = `${job.cssWidth}px`;
         canvas.style.height = `${job.cssHeight}px`;
         canvas.getContext("bitmaprenderer")!.transferFromImageBitmap(bitmap);
@@ -122,6 +126,9 @@ export function Workspace({
     void pump();
   }, [edits, scale, width, height, display, pump]);
 
+  const cssW = Math.max(1, Math.round(width * display));
+  const cssH = Math.max(1, Math.round(height * display));
+
   return (
     <div
       ref={stageRef}
@@ -129,7 +136,16 @@ export function Workspace({
       tabIndex={0}
       aria-label="Image preview. Use the arrow keys to scroll when zoomed in."
     >
-      <canvas ref={canvasRef} className="editor-canvas" />
+      <div
+        className="editor-canvas-wrap"
+        style={{
+          width: `${cssW}px`,
+          height: `${cssH}px`
+        }}
+      >
+        <canvas ref={canvasRef} className="editor-canvas" />
+        {children}
+      </div>
       {error && (
         <p className="editor-stage-error" role="alert">
           {error}

@@ -136,10 +136,15 @@
   outline: 2px solid $accent1;
   outline-offset: 2px;
 }
-.editor-canvas {
-  /* Centred, and scrollable on every side when zoomed in. */
+.editor-canvas-wrap {
+  position: relative;
   margin: auto;
   flex: none;
+  overflow: hidden;
+}
+.editor-canvas {
+  /* Centred, and scrollable on every side when zoomed in. */
+  display: block;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 .editor-stage-error {
@@ -247,8 +252,216 @@
   }
 }
 
+.editor-box-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.editor-box {
+  position: absolute;
+  pointer-events: auto;
+  cursor: move;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  outline: 1px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+
+  &:focus-visible {
+    outline: 2px solid $accent1;
+  }
+}
+
+.editor-box-circle {
+  border-radius: 50%;
+  outline: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.editor-box-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  .grid-h {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .grid-h1 {
+    top: 33.33%;
+  }
+  .grid-h2 {
+    top: 66.66%;
+  }
+
+  .grid-v {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .grid-v1 {
+    left: 33.33%;
+  }
+  .grid-v2 {
+    left: 66.66%;
+  }
+}
+
+.editor-box-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  border: 1px solid #111111;
+  box-sizing: border-box;
+  pointer-events: auto;
+  border-radius: 1px;
+}
+
+.editor-handle-nw {
+  top: -5px;
+  left: -5px;
+}
+.editor-handle-n {
+  top: -5px;
+  left: calc(50% - 5px);
+}
+.editor-handle-ne {
+  top: -5px;
+  right: -5px;
+}
+.editor-handle-e {
+  top: calc(50% - 5px);
+  right: -5px;
+}
+.editor-handle-se {
+  bottom: -5px;
+  right: -5px;
+}
+.editor-handle-s {
+  bottom: -5px;
+  left: calc(50% - 5px);
+}
+.editor-handle-sw {
+  bottom: -5px;
+  left: -5px;
+}
+.editor-handle-w {
+  top: calc(50% - 5px);
+  left: -5px;
+}
+
+.editor-exact-grid,
+.editor-sides-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-crop-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editor-crop-size {
+  font-weight: 600;
+  font-size: 13px;
+  color: $ink;
+}
+
+.editor-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.editor-presets-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Boxes for hidden areas and the watermark: no darkening around them. */
+.editor-box-plain {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  outline: 2px dashed rgba(255, 255, 255, 0.95);
+  outline-offset: -1px;
+}
+
+/* Drag on the picture to draw a new hidden area. */
+.editor-draw-surface {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+  touch-action: none;
+}
+.editor-draw-preview {
+  position: absolute;
+  pointer-events: none;
+  outline: 2px dashed rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.editor-slider-field {
+  gap: 4px;
+}
+.editor-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.editor-reset-one {
+  padding: 0;
+  border: none;
+  background: none;
+  color: $accent1;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:disabled {
+    color: $inkSoft;
+    text-decoration: none;
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.editor-redaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.editor-redaction-list .tool-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-logo-name {
+  overflow-wrap: anywhere;
+}
+
 .dark-mode {
   .editor {
+    color: $inkSoftDark;
+  }
+  .editor-crop-size {
+    color: $textColorDark;
+  }
+  .editor-reset-one {
+    color: $accentLight;
+  }
+  .editor-reset-one:disabled {
     color: $inkSoftDark;
   }
   .editor-topbar,
