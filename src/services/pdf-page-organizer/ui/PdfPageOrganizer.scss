@@ -1,0 +1,218 @@
+@import "../../../_globalColor";
+
+/* PDF Page Organizer: the page grid and its toolbar. Card sizes match
+   the numbers in PageGrid.tsx. */
+
+.pdf-files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pdf-files .tool-file {
+  flex-wrap: wrap;
+}
+.pdf-files .tool-button {
+  margin-left: auto;
+  padding: 6px 10px;
+}
+
+.pdf-help {
+  margin: 0 0 12px;
+}
+.pdf-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.pdf-toolbar .tool-button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.pdf-count {
+  margin: 0;
+  flex: 0 1 auto;
+}
+.pdf-move-to {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.pdf-move-to .tool-input {
+  width: 72px;
+  padding: 7px 10px;
+}
+
+.pdf-grid {
+  display: grid;
+  box-sizing: border-box;
+  align-content: start;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  list-style: none;
+}
+.pdf-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid $hairline;
+  background-color: rgba(255, 255, 255, 0.6);
+  cursor: grab;
+}
+.pdf-page-selected {
+  border-color: $accent1;
+  box-shadow: inset 0 0 0 1px $accent1;
+  background-color: $accentSoft;
+}
+.pdf-page-dragged {
+  opacity: 0.45;
+}
+.pdf-page-drop-before::before,
+.pdf-page-drop-after::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: $accent1;
+}
+.pdf-page-drop-before::before {
+  left: -8px;
+}
+.pdf-page-drop-after::after {
+  right: -8px;
+}
+
+.pdf-page-thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 148px;
+  padding: 0;
+  cursor: pointer;
+}
+.pdf-page-check:focus-visible,
+.pdf-icon-button:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
+}
+.pdf-page-thumb img {
+  /* Fits in a square, so it still fits when turned. */
+  max-width: 140px;
+  max-height: 140px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  background-color: #fff;
+  transition: transform 0.15s ease;
+}
+.pdf-page-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 140px;
+  border: 1px dashed $hairline;
+  background-color: #fff;
+  font-size: 12px;
+  color: $inkMuted;
+}
+.pdf-page-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: $accent1;
+  cursor: pointer;
+}
+.pdf-page-number {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: $ink;
+}
+.pdf-page-origin {
+  margin: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: $inkMuted;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pdf-page-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.pdf-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 13px;
+  color: $inkSoft;
+  cursor: pointer;
+}
+.pdf-icon-button:hover:not(:disabled) {
+  border-color: $accent1;
+  color: $accent1;
+}
+.pdf-icon-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pdf-order {
+  margin-bottom: 16px;
+}
+.pdf-order .tool-list {
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.dark-mode {
+  .pdf-page {
+    border-color: $hairlineDark;
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+  .pdf-page-selected {
+    border-color: $accentLight;
+    box-shadow: inset 0 0 0 1px $accentLight;
+    background-color: $accentSoftDark;
+  }
+  .pdf-page-drop-before::before,
+  .pdf-page-drop-after::after {
+    background-color: $accentLight;
+  }
+  .pdf-page-number {
+    color: $textColorDark;
+  }
+  .pdf-page-origin {
+    color: $inkMutedDark;
+  }
+  .pdf-page-check {
+    accent-color: $accentLight;
+  }
+  .pdf-icon-button {
+    color: $inkSoftDark;
+  }
+  .pdf-icon-button:hover:not(:disabled) {
+    border-color: $accentLight;
+    color: $accentLight;
+  }
+}

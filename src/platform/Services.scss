@@ -133,11 +133,6 @@
   font-size: 18px;
   color: $accent1;
 }
-.service-card-status {
-  padding: 1px 6px;
-  border: 1px solid $accent2;
-  color: $accent2;
-}
 .service-card-name {
   margin: 0;
   font-size: 1.25rem;
@@ -169,32 +164,37 @@
   font-size: 0.75em;
   color: $accent1;
 }
-.service-page-section,
-.service-page-soon {
+.service-page-section {
   margin-bottom: 32px;
   font-size: 18px;
   line-height: 1.7;
 }
-.service-page-section h2,
-.service-page-soon h2 {
+.service-page-section h2 {
   margin: 0 0 8px;
   font-size: 22px;
   color: $ink;
 }
-.service-page-section p,
-.service-page-soon p {
+.service-page-section p {
   margin: 0;
 }
-.service-page-soon {
-  padding: 20px 24px;
-  border: 1px dashed $accent2;
+
+.service-page-live .blog-page-header {
+  margin-bottom: 16px;
 }
-.service-page-soon a {
-  color: $accent1;
+.service-page-about {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid $hairline;
+  font-size: 16px;
+  color: $inkMuted;
+}
+.service-page-about p + p {
+  margin-top: 12px;
 }
 
 /* Dark theme */
 .dark-mode {
+  .service-page-about,
   .services-privacy,
   .services-search input,
   .services-chip,
@@ -211,8 +211,7 @@
     color: $inkSoftDark;
   }
   .services-chip,
-  .service-page-section,
-  .service-page-soon {
+  .service-page-section {
     color: $inkSoftDark;
   }
   .services-chip[aria-pressed="true"] {
@@ -222,8 +221,7 @@
   }
   .services-search input,
   .service-card-name,
-  .service-page-section h2,
-  .service-page-soon h2 {
+  .service-page-section h2 {
     color: $textColorDark;
   }
   .services-search-label,
@@ -235,7 +233,6 @@
   .services-privacy i,
   .service-card-top i,
   .service-page-icon,
-  .service-page-soon a,
   .service-card:hover .service-card-arrow {
     color: $accentLight;
   }

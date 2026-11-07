@@ -86,9 +86,6 @@ export default function CatalogPage() {
                   <span className="service-card-category">
                     {service.category}
                   </span>
-                  {service.status === "coming-soon" && (
-                    <span className="service-card-status">Coming soon</span>
-                  )}
                 </span>
                 <h2 className="service-card-name">{service.name}</h2>
                 <p className="service-card-summary">{service.summary}</p>

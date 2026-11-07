@@ -3,8 +3,16 @@
    (scripts/generate-sitemap.js) are all built from this list, so adding a
    service means adding one entry here (plus its folder once it is built).
 
-   Keep this file free of imports: the sitemap script loads it outside the
-   app bundle. */
+   Keep this file free of runtime imports: the sitemap script loads it
+   outside the app bundle. Tools are only loaded (lazily) when opened. */
+
+import type {ComponentType} from "react";
+import type {
+  ImageLimits,
+  PdfLimits,
+  ServiceLimits,
+  TextLimits
+} from "../shared/limits";
 
 export const SERVICE_CATEGORIES = [
   "Text and lists",
@@ -16,9 +24,12 @@ export const SERVICE_CATEGORIES = [
 
 export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number];
 
-export type ServiceStatus = "coming-soon";
+/** Loads a tool's code (only when its page is opened). The tool gets its limits. */
+export type ToolLoader<L extends ServiceLimits> = () => Promise<{
+  default: ComponentType<{limits: L}>;
+}>;
 
-export interface ServiceDefinition {
+interface ServiceBase {
   /** URL part: the tool lives at /services/<slug>. Lowercase words and dashes. */
   slug: string;
   name: string;
@@ -33,8 +44,51 @@ export interface ServiceDefinition {
   icon: string;
   /** Title and description for search engines and link previews. */
   seo: {title: string; description: string};
-  status: ServiceStatus;
 }
+
+/** A tool, with the limits it works within and how to load its code. */
+export type ServiceDefinition = ServiceBase &
+  (
+    | {limits: TextLimits; load: ToolLoader<TextLimits>}
+    | {limits: ImageLimits; load: ToolLoader<ImageLimits>}
+    | {limits: PdfLimits; load: ToolLoader<PdfLimits>}
+  );
+
+/* Text and list tools: the work runs in a background worker, so these
+   sizes are about memory, not speed. Phones get smaller files. */
+const TEXT_TOOL_LIMITS: TextLimits = {
+  kind: "text",
+  maxFileMB: 50,
+  maxFileMBMobile: 15,
+  maxRows: 200000
+};
+
+/* Image tools: a decoded image takes about 4 bytes per pixel, so the
+   limits are about memory. A 12-megapixel phone photo is well within them. */
+const IMAGE_TOOL_LIMITS: ImageLimits = {
+  kind: "images",
+  maxFileMB: 50,
+  maxFileMBMobile: 25,
+  maxFiles: 300,
+  maxFilesMobile: 60,
+  maxMegapixels: 100,
+  maxMegapixelsMobile: 40
+};
+
+/* PDF tools: an open PDF is held in memory twice at most (once for the
+   page previews, once while the new file is built), so the total size
+   is what matters. Previews are drawn only for pages near the screen. */
+const PDF_TOOL_LIMITS: PdfLimits = {
+  kind: "pdf",
+  maxFileMB: 100,
+  maxFileMBMobile: 40,
+  maxFiles: 20,
+  maxFilesMobile: 10,
+  maxTotalMB: 250,
+  maxTotalMBMobile: 60,
+  maxPages: 2000,
+  maxPagesMobile: 500
+};
 
 export const services: readonly ServiceDefinition[] = [
   {
@@ -42,7 +96,7 @@ export const services: readonly ServiceDefinition[] = [
     name: "Text Splitter",
     summary: "Split text or a column into separate columns or rows.",
     description:
-      "Paste text or open a spreadsheet and split each line wherever a separator appears, such as a comma, space or dash. Name the new columns, check the preview and download the result as a spreadsheet.",
+      "Paste text or open a text or CSV file and split each line wherever a separator appears, such as a comma, semicolon or tab. Name the new columns, check the preview and download the result as an Excel, CSV or text file.",
     category: "Text and lists",
     keywords: ["split", "separate", "columns", "comma", "break apart"],
     icon: "fas fa-cut",
@@ -51,7 +105,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Split text or spreadsheet columns into separate columns or rows by a separator. Free, and your data never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/text-splitter")
   },
   {
     slug: "column-combiner",
@@ -67,7 +122,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Join two or more spreadsheet columns into one with your own separator. Free, and your data never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/column-combiner")
   },
   {
     slug: "list-cleaner",
@@ -84,7 +140,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Remove duplicates, extra spaces and blank lines from a list and sort it. Free, and your data never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/list-cleaner")
   },
   {
     slug: "two-list-comparator",
@@ -100,7 +157,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Compare two lists to find shared items and items missing from either list. Free, and your data never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/two-list-comparator")
   },
   {
     slug: "bulk-image-resizer",
@@ -116,7 +174,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Resize a batch of images to the same size and download them together. Free, and your images never leave your browser."
     },
-    status: "coming-soon"
+    limits: IMAGE_TOOL_LIMITS,
+    load: () => import("../services/bulk-image-resizer")
   },
   {
     slug: "smart-image-compressor",
@@ -141,7 +200,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Reduce image file sizes by quality or target size. Free, and your images never leave your browser."
     },
-    status: "coming-soon"
+    limits: IMAGE_TOOL_LIMITS,
+    load: () => import("../services/smart-image-compressor")
   },
   {
     slug: "text-formatter",
@@ -163,14 +223,15 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Change text case, fix spacing and line breaks, and find and replace. Free, and your text never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/text-formatter")
   },
   {
     slug: "pdf-page-organizer",
     name: "PDF Page Organizer",
     summary: "Reorder, remove or combine PDF pages.",
     description:
-      "Open one or more PDFs, see every page, then drag or use the keyboard to reorder, remove or rotate pages and save a new PDF. Pages keep their original quality.",
+      "Open one or more PDFs and see every page. Drag pages (or use the arrow buttons) to change their order, turn or remove pages, copy pages, and save a new PDF, or save just the pages you pick. Pages keep their original quality: text stays sharp and searchable.",
     category: "PDF",
     keywords: ["pdf", "reorder", "merge", "delete pages", "rotate", "combine"],
     icon: "fas fa-file-pdf",
@@ -179,23 +240,26 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Reorder, remove, rotate and combine PDF pages without losing quality. Free, and your files never leave your browser."
     },
-    status: "coming-soon"
+    limits: PDF_TOOL_LIMITS,
+    load: () => import("../services/pdf-page-organizer")
   },
   {
     slug: "date-time-formatter",
     name: "Smart Date & Time Formatter",
-    summary: "Convert dates and times into the format you need.",
+    summary:
+      "Convert dates and times into the format you need, or count days between them.",
     description:
-      "Paste or open a column of dates and change them to the format you need, or add days and months. If a date could be read two ways, such as 03/04, you are asked which one you mean.",
+      "Paste or open a column of dates and change them to the format you need, add or subtract days, weeks or months, or count the days and working days between two dates. If a date could be read two ways, such as 03/04, you are asked which one you mean.",
     category: "Dates",
     keywords: ["date", "time", "format", "convert", "add days", "working days"],
     icon: "fas fa-calendar-alt",
     seo: {
       title: "Smart Date & Time Formatter: convert date formats",
       description:
-        "Convert columns of dates and times to any format and add days or months. Free, and your data never leaves your browser."
+        "Convert dates and times to any format, add days or months, and count working days. Free, and your data never leaves your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/date-time-formatter")
   },
   {
     slug: "csv-converter",
@@ -219,7 +283,8 @@ export const services: readonly ServiceDefinition[] = [
       description:
         "Convert CSV to Excel and Excel to CSV while keeping IDs and leading zeros intact. Free, and your files never leave your browser."
     },
-    status: "coming-soon"
+    limits: TEXT_TOOL_LIMITS,
+    load: () => import("../services/csv-converter")
   }
 ];
 

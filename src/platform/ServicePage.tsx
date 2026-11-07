@@ -1,11 +1,29 @@
-import React from "react";
+import React, {lazy, Suspense} from "react";
 import "../containers/blogPage/BlogPage.scss";
 import "./Services.scss";
+import "../shared/ui/Tool.scss";
 import {Link} from "../utils/router";
 import {greeting} from "../portfolio";
-import type {ServiceDefinition} from "./registry";
+import type {ServiceLimits} from "../shared/limits";
+import type {ServiceDefinition, ToolLoader} from "./registry";
+import ToolErrorBoundary from "./ToolErrorBoundary";
 import {usePageMeta} from "./usePageMeta";
 import PrivacyNote from "./PrivacyNote";
+import {formatCount} from "../shared/text/numbers";
+
+/* Each tool's code is fetched the first time its page opens, then reused.
+   (Every loader is typed with the limits its tool takes; the registry
+   pairs them, so the cast here is safe.) */
+type AnyTool = React.ComponentType<{limits: ServiceLimits}>;
+const toolComponents = new Map<string, React.LazyExoticComponent<AnyTool>>();
+function toolComponent(service: ServiceDefinition) {
+  let component = toolComponents.get(service.slug);
+  if (!component) {
+    component = lazy(service.load as ToolLoader<ServiceLimits>);
+    toolComponents.set(service.slug, component);
+  }
+  return component;
+}
 
 /* /services/<slug>: one tool's page. */
 export default function ServicePage({service}: {service: ServiceDefinition}) {
@@ -15,7 +33,7 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
   );
 
   return (
-    <main className="blog-page blog-page-narrow">
+    <main className="blog-page service-page-live">
       <div className="blog-page-bar">
         <Link to="/services" className="blog-page-back">
           ← All tools
@@ -33,21 +51,52 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
         <p className="blog-page-lede">{service.summary}</p>
         <PrivacyNote />
       </header>
-
-      <section className="service-page-section">
-        <h2>What this tool does</h2>
-        <p>{service.description}</p>
-      </section>
-
-      {service.status === "coming-soon" && (
-        <section className="service-page-soon" role="status">
-          <h2>Coming soon</h2>
-          <p>
-            This tool is being built. In the meantime, see the{" "}
-            <Link to="/services">other tools</Link>.
-          </p>
-        </section>
-      )}
+      <LiveTool service={service} />
     </main>
   );
+}
+
+function LiveTool({service}: {service: ServiceDefinition}) {
+  const Tool = toolComponent(service);
+  const {limits} = service;
+  return (
+    <>
+      <ToolErrorBoundary>
+        <Suspense
+          fallback={<p className="blog-page-status">Loading the tool…</p>}
+        >
+          <Tool limits={limits} />
+        </Suspense>
+      </ToolErrorBoundary>
+      <section className="service-page-section service-page-about">
+        <h2>About this tool</h2>
+        <p>{service.description}</p>
+        <p>
+          {aboutLimits(limits)} Everything happens on your device: nothing is
+          uploaded, and nothing is kept after you close the page.
+        </p>
+      </section>
+    </>
+  );
+}
+
+function aboutLimits(limits: ServiceLimits): string {
+  switch (limits.kind) {
+    case "text":
+      return `It works with files up to ${limits.maxFileMB} MB (${
+        limits.maxFileMBMobile
+      } MB on phones and tablets) and up to ${formatCount(
+        limits.maxRows
+      )} rows at a time.`;
+    case "images":
+      return `It works with up to ${limits.maxFiles} images at a time (${limits.maxFilesMobile} on phones and tablets), each up to ${limits.maxFileMB} MB and ${limits.maxMegapixels} megapixels (${limits.maxMegapixelsMobile} on phones and tablets).`;
+    case "pdf":
+      return `It works with up to ${limits.maxFiles} PDFs at a time, ${
+        limits.maxTotalMB
+      } MB and ${formatCount(limits.maxPages)} pages in total (${
+        limits.maxFilesMobile
+      } PDFs, ${limits.maxTotalMBMobile} MB and ${formatCount(
+        limits.maxPagesMobile
+      )} pages on phones and tablets).`;
+  }
 }

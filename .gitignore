@@ -27,3 +27,8 @@ public/profile.json
 public/blogs.json
 public/sitemap.xml
 public/robots.txt
+
+# Playwright
+/e2e/test-results
+/test-results
+/playwright-report
