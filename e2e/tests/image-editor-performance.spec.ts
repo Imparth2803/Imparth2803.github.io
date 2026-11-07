@@ -4,20 +4,11 @@ import {openTool} from "./helpers";
 /* Timing tests for the editor's heavier tools: dragging a colour slider
    and adding effects on a 24-megapixel photo, and a collage of nine large
    photos, must never freeze the page for more than 100 ms (all the pixel
-   work happens in the background worker).
-
-   This file isn't named like performance.spec.ts on purpose: the timing
-   projects run their files side by side, and these heavy tests would slow
-   the other tools' timing tests down. It runs with the ordinary tests
-   instead, in Chromium and Firefox, with a wide margin under the limit. */
+   work happens in the background worker). They run on their own, after
+   the other timing tests (see playwright.config.ts). */
 test.describe.configure({mode: "serial"});
-test.skip(
-  ({browserName}) => browserName === "webkit",
-  "Timed in Chromium and Firefox, like the other timing tests."
-);
 
 const TARGET_MS = 100;
-const COLLAGE_TARGET_MS = 200;
 
 /** The longest gap in a 10 ms timer while `work` runs (a freeze). */
 async function longestFreeze(page: Page, work: () => Promise<void>) {
@@ -156,8 +147,5 @@ test("Image Editor: a 3 × 3 collage of nine 4000 × 4000 photos", async ({
       0
     )} ms`
   );
-  // Alone, this measures 5–45 ms. It runs alongside other tests, which
-  // compete for the computer while nine large photos are being opened, so
-  // it allows more than the slider test; a real freeze would be far longer.
-  expect(freeze).toBeLessThan(COLLAGE_TARGET_MS);
+  expect(freeze).toBeLessThan(TARGET_MS);
 });

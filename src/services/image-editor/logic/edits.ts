@@ -3,6 +3,11 @@
    original plus these settings, so changing a setting never wears the
    picture down. */
 
+import {
+  FitMode,
+  planResize,
+  SizeChoice
+} from "../../../shared/images/resizePlan";
 import {Frame, framedSize, NO_FRAME} from "./frame";
 import {Adjust, Effects, NO_ADJUST, NO_EFFECTS} from "./pixels";
 import {NO_WATERMARK, Watermark} from "./watermark";
@@ -39,6 +44,14 @@ export interface Crop {
 
 export const NO_CROP: Crop | null = null;
 
+/** A new size for the image (after crop), as on the Bulk Image Resizer. */
+export interface Resize {
+  choice: SizeChoice;
+  fit: FitMode;
+}
+
+export const NO_RESIZE: Resize | null = null;
+
 export interface Transform {
   /** Quarter turns clockwise. */
   quarter: 0 | 1 | 2 | 3;
@@ -52,6 +65,7 @@ export interface Transform {
 export interface Edits {
   transform: Transform;
   crop?: Crop | null;
+  resize?: Resize | null;
   adjust?: Adjust;
   effects?: Effects;
   redactions?: Redaction[];
@@ -69,6 +83,7 @@ export const NO_TRANSFORM: Transform = {
 export const NO_EDITS: Edits = {
   transform: NO_TRANSFORM,
   crop: NO_CROP,
+  resize: NO_RESIZE,
   adjust: NO_ADJUST,
   effects: NO_EFFECTS,
   redactions: NO_REDACTIONS,
@@ -128,6 +143,7 @@ export function transformedSize(
 const normalizeEdits = (e: Edits): Edits => ({
   transform: e.transform,
   crop: e.crop ?? NO_CROP,
+  resize: e.resize ?? NO_RESIZE,
   adjust: e.adjust ?? NO_ADJUST,
   effects: e.effects ?? NO_EFFECTS,
   redactions: e.redactions ?? NO_REDACTIONS,
@@ -141,10 +157,19 @@ export function sameEdits(a: Edits, b: Edits): boolean {
   );
 }
 
-/** Whether the result can have see-through areas that the image didn't. */
-export function addsEmptyAreas(edits: Edits): boolean {
+/** Whether the result can have see-through areas that the image didn't.
+    With the image's size, a resize that leaves empty space counts too. */
+export function addsEmptyAreas(
+  edits: Edits,
+  imageSize?: {width: number; height: number}
+): boolean {
   const f = edits.frame ?? NO_FRAME;
+  const resized =
+    imageSize && edits.resize
+      ? resizePlanFor(imageSize.width, imageSize.height, edits)
+      : null;
   return (
+    !!resized?.padded ||
     edits.transform.fine !== 0 ||
     edits.crop?.shape === "circle" ||
     (f.paddingColour === "transparent" &&
@@ -161,10 +186,35 @@ export function resultSize(
   imageHeight: number,
   edits: Edits
 ): {width: number; height: number} {
-  const t = transformedSize(imageWidth, imageHeight, edits.transform);
-  const w = edits.crop ? edits.crop.width : t.width;
-  const h = edits.crop ? edits.crop.height : t.height;
-  return framedSize(w, h, edits.frame ?? NO_FRAME);
+  const plan = resizePlanFor(imageWidth, imageHeight, edits);
+  if (plan) return framedSize(plan.width, plan.height, edits.frame ?? NO_FRAME);
+  const c = croppedSize(imageWidth, imageHeight, edits);
+  return framedSize(c.width, c.height, edits.frame ?? NO_FRAME);
+}
+
+/** The image's size after rotate & flip and crop (before resizing). */
+export function croppedSize(
+  imageWidth: number,
+  imageHeight: number,
+  edits: Edits
+): {width: number; height: number} {
+  if (edits.crop) return {width: edits.crop.width, height: edits.crop.height};
+  return transformedSize(imageWidth, imageHeight, edits.transform);
+}
+
+/** How the resize fits the cropped image, or null when there is none. */
+export function resizePlanFor(
+  imageWidth: number,
+  imageHeight: number,
+  edits: Edits
+) {
+  if (!edits.resize) return null;
+  const c = croppedSize(imageWidth, imageHeight, edits);
+  try {
+    return planResize(c.width, c.height, edits.resize.choice, edits.resize.fit);
+  } catch {
+    return null; // no size given yet
+  }
 }
 
 export function sameTransform(a: Transform, b: Transform): boolean {
@@ -179,13 +229,28 @@ export function sameTransform(a: Transform, b: Transform): boolean {
 const sameCrop = (a?: Crop | null, b?: Crop | null) =>
   JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
-/** What an earlier change (turning, flipping or a new crop) would remove
-    from the later steps, which are placed relative to the earlier ones. */
+/** Whether a resize can move the picture inside the image (Contain adds
+    space, Cover cuts edges), which shifts what later steps placed on it. */
+const movesPicture = (r?: Resize | null) =>
+  !!r &&
+  r.fit !== "stretch" &&
+  r.choice.kind === "box" &&
+  r.choice.width !== null &&
+  r.choice.height !== null;
+
+/** What an earlier change (turning, flipping, a new crop, or a resize that
+    moves the picture) would remove from the later steps, which are placed
+    relative to the earlier ones. */
 function removedBy(prev: Edits, next: Edits) {
   const turned = !sameTransform(prev.transform, next.transform);
-  const recropped = turned || !sameCrop(prev.crop, next.crop);
+  const resized =
+    JSON.stringify(prev.resize ?? null) !==
+      JSON.stringify(next.resize ?? null) &&
+    (movesPicture(prev.resize) || movesPicture(next.resize));
+  const recropped = turned || resized || !sameCrop(prev.crop, next.crop);
   return {
     turned,
+    recroppedOnly: !turned && !resized,
     crop: turned && !!next.crop,
     redactions: recropped && (next.redactions?.length ?? 0) > 0,
     position: recropped && next.watermark?.anchor === "custom"
@@ -221,8 +286,10 @@ export function noticeForEarlierChange(
     removed.position && "the watermark's position"
   ].filter((x): x is string => !!x);
   if (lost.length === 0) return null;
-  const doer = !removed.turned
+  const doer = removed.recroppedOnly
     ? "Changing the crop"
+    : !removed.turned
+    ? "Changing the size"
     : prev.transform.quarter !== next.transform.quarter ||
       prev.transform.fine !== next.transform.fine
     ? "Turning the image"
@@ -241,6 +308,7 @@ export function previewEditsFor(tool: string, edits: Edits): Edits {
     // The whole turned image, so the crop box can be drawn over it.
     if (
       !edits.crop &&
+      !edits.resize &&
       !edits.redactions?.length &&
       !edits.watermark &&
       edits.frame === NO_FRAME
@@ -250,6 +318,7 @@ export function previewEditsFor(tool: string, edits: Edits): Edits {
     return {
       ...edits,
       crop: null,
+      resize: NO_RESIZE,
       redactions: NO_REDACTIONS,
       watermark: NO_WATERMARK,
       frame: NO_FRAME

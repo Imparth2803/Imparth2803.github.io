@@ -6,6 +6,7 @@ import {
   hasTransparency,
   newCanvas
 } from "../../../shared/images/canvas";
+import {CompressAim, compressPicture} from "../../../shared/images/compress";
 import {ImageType, InputType} from "../../../shared/images/header";
 import {UserError} from "../../../shared/text/userError";
 import {formatCount} from "../../../shared/text/numbers";
@@ -397,7 +398,8 @@ const handlers = {
     format,
     quality,
     background,
-    keepCamera = false
+    keepCamera = false,
+    compress
   }: {
     edits: Edits;
     format: ImageType;
@@ -405,6 +407,8 @@ const handlers = {
     background: string;
     /** JPG only: copy the original's camera details (never the location). */
     keepCamera?: boolean;
+    /** Make the file smaller, as the Smart Image Compressor does. */
+    compress?: {aim: CompressAim; allowResize: boolean};
   }) {
     const {canvas} = renderEdits(
       opened(),
@@ -415,23 +419,68 @@ const handlers = {
       logos
     );
     try {
-      let blob = await encodeCanvas(
-        canvas,
-        format,
-        format === "png" ? undefined : quality
-      );
-      let camera: "kept" | "none" | "damaged" | "too-big" | null = null;
-      if (keepCamera && format === "jpeg") {
-        const details = cameraDetailsFor(
-          await sourceBytes(),
-          canvas.width,
-          canvas.height
+      // The camera details are worked out first, so a size target can
+      // leave room for them.
+      const details =
+        keepCamera && format === "jpeg"
+          ? cameraDetailsFor(await sourceBytes(), canvas.width, canvas.height)
+          : null;
+      const camera: "kept" | "none" | "damaged" | "too-big" | null = details
+        ? details.ok
+          ? "kept"
+          : details.reason
+        : null;
+
+      let blob: Blob;
+      let width = canvas.width;
+      let height = canvas.height;
+      let notes: string[] = [];
+      let reached = true;
+      let needs: "resize" | "webp" | null = null;
+      let aimed: number | null = null;
+      if (compress) {
+        // Every try is encoded from this one full-size picture, never from
+        // an earlier try, so quality is only lost once.
+        const room = details?.ok ? details.segment.length : 0;
+        const aim: CompressAim =
+          compress.aim.kind === "target"
+            ? {kind: "target", bytes: Math.max(1, compress.aim.bytes - room)}
+            : compress.aim;
+        aimed = compress.aim.kind === "target" ? compress.aim.bytes : null;
+        const result = await compressPicture(
+          canvas,
+          format,
+          aim,
+          background,
+          maxMegapixels,
+          compress.allowResize
         );
-        camera = details.ok ? "kept" : details.reason;
-        if (details.ok) {
+        blob = result.blob;
+        width = result.page.w;
+        height = result.page.h;
+        if (result.page.canvas !== canvas) {
+          result.page.canvas.width = result.page.canvas.height = 0;
+        }
+        notes = result.notes;
+        reached = result.reached;
+        needs = result.needs;
+      } else {
+        blob = await encodeCanvas(
+          canvas,
+          format,
+          format === "png" ? undefined : quality
+        );
+      }
+      if (details?.ok) {
+        // The size recorded must match the file (it may have shrunk).
+        const sized =
+          width === canvas.width
+            ? details
+            : cameraDetailsFor(await sourceBytes(), width, height);
+        if (sized.ok) {
           const bytes = insertIntoJpeg(
             new Uint8Array(await blob.arrayBuffer()),
-            details.segment
+            sized.segment
           );
           if (readMetadata(bytes).gps !== null) {
             throw new UserError(
@@ -441,7 +490,8 @@ const handlers = {
           blob = new Blob([bytes], {type: "image/jpeg"});
         }
       }
-      return {blob, width: canvas.width, height: canvas.height, camera};
+      if (aimed !== null && blob.size > aimed) reached = false;
+      return {blob, width, height, camera, notes, reached, needs, aimed};
     } finally {
       canvas.width = canvas.height = 0;
     }

@@ -1,13 +1,16 @@
 import {drawScaled, newCanvas} from "../../../shared/images/canvas";
 import {UserError} from "../../../shared/text/userError";
+import type {Plan} from "../../../shared/images/resizePlan";
 import {
   Adjust,
   angleOf,
   Crop,
+  croppedSize,
   Edits,
   Effects,
   Frame,
   Redaction,
+  resizePlanFor,
   Transform,
   transformedSize,
   Watermark
@@ -200,6 +203,41 @@ function stepFrame(
   // 3. Image
   ctx.drawImage(input, left + b, top + b);
 
+  input.width = input.height = 0;
+  return canvas;
+}
+
+/* Resizes the cropped image as planned for its full size. The input may be
+   a smaller preview of it; the output is the planned size at this scale.
+   Big reductions are drawn in halving steps for quality (as the Bulk Image
+   Resizer does). */
+function stepResize(
+  input: OffscreenCanvas,
+  plan: Plan | null,
+  fullWidth: number,
+  fullHeight: number,
+  scale: number,
+  maxMegapixels: number
+): OffscreenCanvas {
+  if (!plan) return input;
+  const exact = scale === 1;
+  const {canvas, ctx} = newCanvas(
+    exact ? plan.width : Math.max(1, Math.round(plan.width * scale)),
+    exact ? plan.height : Math.max(1, Math.round(plan.height * scale)),
+    exact ? maxMegapixels : Infinity
+  );
+  const fx = input.width / fullWidth;
+  const fy = input.height / fullHeight;
+  const kx = canvas.width / plan.width;
+  const ky = canvas.height / plan.height;
+  const [sx, sy, sw, sh] = plan.from;
+  const [dx, dy, dw, dh] = plan.to;
+  drawScaled(input, [sx * fx, sy * fy, sw * fx, sh * fy], ctx, [
+    dx * kx,
+    dy * ky,
+    dw * kx,
+    dh * ky
+  ]);
   input.width = input.height = 0;
   return canvas;
 }
@@ -407,9 +445,22 @@ export function renderEdits(
     source.height,
     edits.transform
   );
+  const plan = resizePlanFor(source.width, source.height, edits);
+  const cropped = croppedSize(source.width, source.height, edits);
+  // When the resize makes the image much smaller, the preview draws the
+  // steps before it at a lower scale too (the saved file always uses the
+  // full size, at scale 1).
+  let upstream = scale;
+  if (plan && scale < 1) {
+    const shrink = Math.max(
+      plan.to[2] / Math.max(1e-9, plan.from[2]),
+      plan.to[3] / Math.max(1e-9, plan.from[3])
+    );
+    upstream = Math.min(1, scale * Math.max(shrink, 1e-3));
+  }
 
   // 1. Rotate & flip
-  let current = stepTransform(source, edits.transform, scale, maxMegapixels);
+  let current = stepTransform(source, edits.transform, upstream, maxMegapixels);
 
   // 2. Crop
   current = stepCrop(
@@ -417,11 +468,19 @@ export function renderEdits(
     edits.crop,
     transformed.width,
     transformed.height,
-    scale,
+    upstream,
     maxMegapixels
   );
 
-  // (Resize comes here in Stage 6.)
+  // 3. Resize
+  current = stepResize(
+    current,
+    plan,
+    cropped.width,
+    cropped.height,
+    scale,
+    maxMegapixels
+  );
 
   // Colour adjust, effects, hidden areas and watermark draw on the same
   // canvas, so they need no extra copies.

@@ -1,4 +1,4 @@
-import {planResize} from "../logic/plan";
+import {planResize} from "../images/resizePlan";
 
 describe("Bulk Image Resizer sizing", () => {
   it("contain fits the whole image and pads, never distorting", () => {

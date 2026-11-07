@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {downloadBlob} from "../../../shared/files/download";
+import type {Level} from "../../../shared/images/compressLevels";
 import {IMAGE_TYPES, ImageType, InputType} from "../../../shared/images/header";
 import {formatBytes} from "../../../shared/limits";
 import {formatCount} from "../../../shared/text/numbers";
@@ -19,7 +20,23 @@ export interface SaveSettings {
   name: string;
   /** JPG only: copy the original's camera details (never the location). */
   keepCamera?: boolean;
+  /** Make the file smaller (as the Smart Image Compressor does). */
+  squeeze?: Squeeze;
 }
+
+export type Squeeze =
+  | {kind: "off"}
+  | {kind: "level"; level: Level; custom: number}
+  | {kind: "target"; kb: number; allowResize: boolean};
+
+const SQUEEZE_LEVELS: {value: string; label: string}[] = [
+  {value: "off", label: "No (use the quality above)"},
+  {value: "high", label: "High quality (a little smaller)"},
+  {value: "balanced", label: "Balanced"},
+  {value: "small", label: "Small file"},
+  {value: "custom", label: "Custom…"},
+  {value: "target", label: "Aim for a file size…"}
+];
 
 /** What Save makes: the file, its size, and (for JPG) whether the camera
     details were copied. */
@@ -28,6 +45,12 @@ export interface MadeFile {
   width: number;
   height: number;
   camera?: "kept" | "none" | "damaged" | "too-big" | null;
+  /** From making the file smaller. */
+  notes?: string[];
+  reached?: boolean;
+  needs?: "resize" | "webp" | null;
+  /** The size aimed for, in bytes. */
+  aimed?: number | null;
 }
 
 export type RenderFile = (settings: {
@@ -79,6 +102,10 @@ export function SavePanel({
   const [made, setMade] = useState<MadeFile | null>(null);
   const keepCamera =
     !render && hasCameraDetails && format === "jpeg" && !!settings.keepCamera;
+  const squeeze: Squeeze = render
+    ? {kind: "off"}
+    : settings.squeeze ?? {kind: "off"};
+  const squeezeKey = JSON.stringify(squeeze);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -93,7 +120,8 @@ export function SavePanel({
             format,
             quality: quality / 100,
             background,
-            keepCamera
+            keepCamera,
+            compress: compressFor(JSON.parse(squeezeKey) as Squeeze)
           })
       ).then(
         result => current && setMade(result),
@@ -111,7 +139,16 @@ export function SavePanel({
       current = false;
       clearTimeout(timer);
     };
-  }, [client, edits, format, quality, background, keepCamera, render]);
+  }, [
+    client,
+    edits,
+    format,
+    quality,
+    background,
+    keepCamera,
+    render,
+    squeezeKey
+  ]);
 
   const fileName = `${cleanName(settings.name)}.${IMAGE_TYPES[format].ext}`;
   const lossy = format !== "png";
@@ -145,7 +182,7 @@ export function SavePanel({
         <p className="tool-field-hint">Only the first frame is kept.</p>
       )}
 
-      {lossy && (
+      {lossy && squeeze.kind === "off" && (
         <div className="tool-field">
           <label className="tool-field-label" htmlFor="editor-quality">
             Quality: {quality}
@@ -184,6 +221,14 @@ export function SavePanel({
             />
           </Field>
         </>
+      )}
+
+      {!render && (
+        <SqueezeFields
+          squeeze={squeeze}
+          format={format}
+          onChange={next => onSettings({...settings, squeeze: next})}
+        />
       )}
 
       {!render && hasCameraDetails && format === "jpeg" && (
@@ -235,6 +280,43 @@ export function SavePanel({
           <p className="tool-muted">Making the file…</p>
         ) : null}
       </div>
+      {made?.aimed != null && (
+        <p className="tool-field-hint">
+          Aimed for {formatBytes(made.aimed)}, got {formatBytes(made.blob.size)}
+          .
+        </p>
+      )}
+      {made?.notes?.map(note => (
+        <Notice key={note} tone={made.reached === false ? "warning" : "info"}>
+          {note}
+        </Notice>
+      ))}
+      {made?.needs === "webp" && webpOk && (
+        <button
+          type="button"
+          className="tool-button"
+          onClick={() =>
+            onSettings({
+              ...settings,
+              format: "webp",
+              quality: DEFAULT_QUALITY.webp
+            })
+          }
+        >
+          Save as WebP instead (much smaller)
+        </button>
+      )}
+      {made?.needs === "resize" && squeeze.kind === "target" && (
+        <button
+          type="button"
+          className="tool-button"
+          onClick={() =>
+            onSettings({...settings, squeeze: {...squeeze, allowResize: true}})
+          }
+        >
+          Allow making the picture smaller to reach the size
+        </button>
+      )}
       {error && <Notice tone="error">{error}</Notice>}
 
       <button
@@ -257,5 +339,126 @@ export function SavePanel({
           : "."}
       </p>
     </div>
+  );
+}
+
+/** The worker's compress settings for a Squeeze choice. */
+function compressFor(squeeze: Squeeze) {
+  if (squeeze.kind === "off") return undefined;
+  if (squeeze.kind === "level") {
+    return {
+      aim: {
+        kind: "level" as const,
+        level: squeeze.level,
+        custom: squeeze.custom
+      },
+      allowResize: false
+    };
+  }
+  return {
+    aim: {kind: "target" as const, bytes: Math.round(squeeze.kb * 1024)},
+    allowResize: squeeze.allowResize
+  };
+}
+
+/* "Make the file smaller": the Smart Image Compressor's levels, or a file
+   size to aim for. */
+function SqueezeFields({
+  squeeze,
+  format,
+  onChange
+}: {
+  squeeze: Squeeze;
+  format: ImageType;
+  onChange: (squeeze: Squeeze) => void;
+}) {
+  const value =
+    squeeze.kind === "level"
+      ? squeeze.level
+      : squeeze.kind === "target"
+      ? "target"
+      : "off";
+  return (
+    <>
+      <Field label="Make the file smaller">
+        <select
+          className="tool-select"
+          value={value}
+          onChange={e => {
+            const v = e.target.value;
+            onChange(
+              v === "off"
+                ? {kind: "off"}
+                : v === "target"
+                ? {kind: "target", kb: 200, allowResize: false}
+                : {kind: "level", level: v as Level, custom: 60}
+            );
+          }}
+        >
+          {SQUEEZE_LEVELS.map(l => (
+            <option key={l.value} value={l.value}>
+              {l.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      {squeeze.kind === "level" && squeeze.level === "custom" && (
+        <div className="tool-field">
+          <label className="tool-field-label" htmlFor="editor-squeeze-custom">
+            Custom quality: {squeeze.custom}
+          </label>
+          <input
+            id="editor-squeeze-custom"
+            type="range"
+            min={1}
+            max={100}
+            value={squeeze.custom}
+            onChange={e =>
+              onChange({...squeeze, custom: Number(e.target.value)})
+            }
+          />
+        </div>
+      )}
+      {squeeze.kind === "target" && (
+        <>
+          <div className="tool-field">
+            <label className="tool-field-label" htmlFor="editor-squeeze-kb">
+              Aim for (KB)
+            </label>
+            <input
+              id="editor-squeeze-kb"
+              className="tool-input editor-number"
+              inputMode="numeric"
+              value={squeeze.kb || ""}
+              onChange={e => {
+                const kb = Number(
+                  e.target.value.replace(/\D/g, "").slice(0, 7)
+                );
+                onChange({...squeeze, kb: kb || 0});
+              }}
+            />
+          </div>
+          {format !== "png" && (
+            <label className="editor-checkbox-row">
+              <input
+                type="checkbox"
+                checked={squeeze.allowResize}
+                onChange={e =>
+                  onChange({...squeeze, allowResize: e.target.checked})
+                }
+              />
+              <span>Allow making the picture smaller to reach it</span>
+            </label>
+          )}
+        </>
+      )}
+      {squeeze.kind !== "off" && (
+        <span className="tool-field-hint">
+          {format === "png"
+            ? "PNG is made smaller by using fewer colours."
+            : "Every try starts from your edited picture, so it is only compressed once."}
+        </span>
+      )}
+    </>
   );
 }

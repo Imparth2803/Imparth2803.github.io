@@ -18,7 +18,12 @@ import {useBatch} from "../../../shared/ui/useBatch";
 import {useTask} from "../../../shared/ui/useTask";
 import {useWorkerPool} from "../../../shared/ui/useWorkerPool";
 import {downloadZip} from "../../../shared/ui/zipDownload";
-import {FitMode, planResize, PRESETS, SizeChoice} from "../logic/plan";
+import {
+  FitMode,
+  planResize,
+  PRESETS,
+  SizeChoice
+} from "../../../shared/images/resizePlan";
 import type {BulkImageResizerApi} from "../worker/bulkImageResizer.worker";
 
 type Resized = Awaited<ReturnType<BulkImageResizerApi["resize"]>>;

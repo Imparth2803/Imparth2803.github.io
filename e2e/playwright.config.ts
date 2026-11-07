@@ -4,7 +4,9 @@ import {defineConfig, devices} from "@playwright/test";
    served like GitHub Pages serves it. Run with: npm run test:e2e
 
    The timing tests (performance.spec.ts) run last, one at a time, so other
-   tests running in parallel can't make the page look slower than it is. */
+   tests running in parallel can't make the page look slower than it is.
+   The Image Editor's heavy timing tests (image-editor-performance.spec.ts)
+   run after those, on their own, so they can't slow the others down. */
 export default defineConfig({
   testDir: "./tests",
   outputDir: "./test-results",
@@ -42,13 +44,27 @@ export default defineConfig({
       name: "timing-chromium",
       use: {...devices["Desktop Chrome"]},
       testMatch: /performance/,
+      testIgnore: /image-editor-performance/,
       dependencies: ["chromium", "firefox", "webkit"]
     },
     {
       name: "timing-firefox",
       use: {...devices["Desktop Firefox"]},
       testMatch: /performance/,
+      testIgnore: /image-editor-performance/,
       dependencies: ["timing-chromium"]
+    },
+    {
+      name: "timing-editor-chromium",
+      use: {...devices["Desktop Chrome"]},
+      testMatch: /image-editor-performance/,
+      dependencies: ["timing-firefox"]
+    },
+    {
+      name: "timing-editor-firefox",
+      use: {...devices["Desktop Firefox"]},
+      testMatch: /image-editor-performance/,
+      dependencies: ["timing-editor-chromium"]
     }
   ]
 });

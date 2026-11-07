@@ -19,7 +19,7 @@ import {useObjectUrl} from "../../../shared/ui/useObjectUrl";
 import {useTask} from "../../../shared/ui/useTask";
 import {useWorkerPool} from "../../../shared/ui/useWorkerPool";
 import {downloadZip} from "../../../shared/ui/zipDownload";
-import type {Level} from "../logic/levels";
+import type {Level} from "../../../shared/images/compressLevels";
 import type {
   CompressSettings,
   SmartImageCompressorApi

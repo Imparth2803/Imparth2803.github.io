@@ -23,6 +23,7 @@ import {ToolError} from "../../../shared/worker/WorkerClient";
 import {
   addsEmptyAreas,
   Crop,
+  croppedSize,
   Edits,
   NO_ADJUST,
   NO_EDITS,
@@ -52,6 +53,7 @@ import {MetadataPanel} from "./MetadataPanel";
 import {PickerOverlay} from "./PickerOverlay";
 import {addRecent, PickerPanel} from "./PickerPanel";
 import {RedactOverlay} from "./RedactOverlay";
+import {ResizePanel} from "./ResizePanel";
 import {newRedaction, RedactPanel} from "./RedactPanel";
 import {DEFAULT_QUALITY, SavePanel, SaveSettings} from "./SavePanel";
 import {TransformPanel} from "./TransformPanel";
@@ -69,6 +71,7 @@ const MAX_LOGO_MEGAPIXELS = 16;
 const TOOLS = [
   {id: "crop", label: "Crop", icon: "fas fa-crop-alt"},
   {id: "transform", label: "Rotate & flip", icon: "fas fa-sync-alt"},
+  {id: "resize", label: "Resize", icon: "fas fa-expand-arrows-alt"},
   {id: "adjust", label: "Colour adjust", icon: "fas fa-sliders-h"},
   {id: "effects", label: "Effects", icon: "fas fa-magic"},
   {id: "redact", label: "Hide areas", icon: "fas fa-eye-slash"},
@@ -126,6 +129,9 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
   const fileInput = useRef<HTMLInputElement>(null);
   /** "Edit one image" or "Make a collage". */
   const [mode, setMode] = useState<"edit" | "collage">("edit");
+  /** Changes when Undo, Redo, Reset or a new image replace the edits, so
+      panels holding typed text start again from the edits. */
+  const [jump, setJump] = useState(0);
   const [collageCount, setCollageCount] = useState(0);
   /** Whether the opened file has camera details that Save could keep. */
   const [hasCamera, setHasCamera] = useState(false);
@@ -158,11 +164,13 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
     setShowOriginal(false);
   }, []);
   const back = useCallback(() => {
+    setJump(j => j + 1);
     setDraft(null);
     setNotice(null);
     setHistory(undo);
   }, []);
   const forward = useCallback(() => {
+    setJump(j => j + 1);
     setDraft(null);
     setNotice(null);
     setHistory(redo);
@@ -229,6 +237,7 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
       });
       setImage({file, type: checked.type, ...info});
       setHistory(start(NO_EDITS));
+      setJump(j => j + 1);
       setDraft(null);
       setNotice(null);
       setCropDraft(null);
@@ -504,6 +513,7 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
             disabled={!edited}
             onClick={() => {
               change(NO_EDITS);
+              setJump(j => j + 1);
               setCropDraft(null);
             }}
           >
@@ -676,6 +686,17 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
               onReset={() => change({...edits, transform: NO_TRANSFORM})}
             />
           )}
+          {tool === "resize" && (
+            <ResizePanel
+              key={jump}
+              resize={edits.resize ?? null}
+              imageSize={croppedSize(image.width, image.height, edits)}
+              maxSide={MAX_SIDE}
+              maxMegapixels={maxMP}
+              onChange={resize => change({...edits, resize})}
+              onPreview={resize => setDraft({...edits, resize})}
+            />
+          )}
           {tool === "adjust" && (
             <AdjustPanel
               adjust={edits.adjust ?? NO_ADJUST}
@@ -746,7 +767,13 @@ export default function ImageEditor({limits}: {limits: EditorLimits}) {
               settings={save}
               onSettings={setSave}
               webpOk={webpOk}
-              seeThrough={image.seeThrough || addsEmptyAreas(history.present)}
+              seeThrough={
+                image.seeThrough ||
+                addsEmptyAreas(history.present, {
+                  width: image.width,
+                  height: image.height
+                })
+              }
               sourceType={image.type}
               hasCameraDetails={hasCamera}
             />

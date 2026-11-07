@@ -396,3 +396,89 @@ describe("Stage 4: hidden areas in pixels", () => {
     });
   });
 });
+
+describe("Stage 6: resize in the editor", () => {
+  const {
+    addsEmptyAreas: empty,
+    noticeForEarlierChange,
+    previewEditsFor,
+    resultSize,
+    withEarlierChange
+  } = require("../logic/edits");
+  const box = (width: number | null, height: number | null) => ({
+    kind: "box" as const,
+    width,
+    height
+  });
+  const area = {
+    id: 1,
+    x: 0.1,
+    y: 0.1,
+    w: 0.2,
+    h: 0.2,
+    kind: "solid" as const,
+    colour: "#000000"
+  };
+
+  it("sizes the result after crop, then resize, then border", () => {
+    const edits = {
+      ...NO_EDITS,
+      crop: {x: 0, y: 0, width: 1600, height: 900, shape: "rect" as const},
+      resize: {choice: box(800, null), fit: "contain"}
+    };
+    expect(resultSize(1600, 1200, edits)).toEqual({width: 800, height: 450});
+    const framed = {
+      ...edits,
+      frame: {...NO_EDITS.frame, border: 10}
+    };
+    expect(resultSize(1600, 1200, framed)).toEqual({width: 820, height: 470});
+    const half = {
+      ...NO_EDITS,
+      resize: {choice: {kind: "percent", percent: 50}, fit: "contain"}
+    };
+    expect(resultSize(1600, 1200, half)).toEqual({width: 800, height: 600});
+  });
+
+  it("counts Contain padding as see-through space (for the JPG warning)", () => {
+    const padded = {
+      ...NO_EDITS,
+      resize: {choice: box(500, 500), fit: "contain"}
+    };
+    expect(empty(padded, {width: 1600, height: 1200})).toBe(true);
+    const covered = {
+      ...NO_EDITS,
+      resize: {choice: box(500, 500), fit: "cover"}
+    };
+    expect(empty(covered, {width: 1600, height: 1200})).toBe(false);
+    // Without the image size, only the other reasons count (as before).
+    expect(empty(padded)).toBe(false);
+  });
+
+  it("a resize that moves the picture clears hidden areas; keeping the shape doesn't", () => {
+    const base = {...NO_EDITS, redactions: [area]};
+    const contain = {...base, resize: {choice: box(500, 500), fit: "contain"}};
+    expect(withEarlierChange(base, contain).redactions).toEqual([]);
+    expect(noticeForEarlierChange(base, contain)).toBe(
+      "Changing the size removed the hidden areas. Press Undo to bring them back."
+    );
+    const narrower = {
+      ...base,
+      resize: {choice: box(800, null), fit: "contain"}
+    };
+    expect(withEarlierChange(base, narrower)).toBe(narrower);
+    const stretched = {
+      ...base,
+      resize: {choice: box(500, 500), fit: "stretch"}
+    };
+    expect(withEarlierChange(base, stretched)).toBe(stretched);
+  });
+
+  it("the crop tool shows the image before resizing", () => {
+    const edits = {
+      ...NO_EDITS,
+      resize: {choice: box(800, null), fit: "contain"}
+    };
+    expect(previewEditsFor("crop", edits).resize).toBeNull();
+    expect(previewEditsFor("resize", edits)).toBe(edits);
+  });
+});

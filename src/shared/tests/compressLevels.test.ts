@@ -1,4 +1,8 @@
-import {lossyQuality, pngColours, searchQuality} from "../logic/levels";
+import {
+  lossyQuality,
+  pngColours,
+  searchQuality
+} from "../images/compressLevels";
 
 /* A fake encoder: file size grows with quality. */
 const fakeEncode = (sizeAt: (q: number) => number) => async (q: number) =>
