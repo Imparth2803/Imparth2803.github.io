@@ -44,6 +44,8 @@ export function useLocation() {
 export function matchRoute(path) {
   const clean = path.replace(/\/+$/, "") || "/";
   if (clean === "/blog") return {name: "blogIndex"};
+  if (clean === "/services") return {name: "services"};
+  if (clean === "/community") return {name: "community"};
   const post = clean.match(/^\/blog\/([\w-]+)$/);
   if (post) return {name: "blogPost", slug: post[1]};
   if (clean === "/") return {name: "home"};

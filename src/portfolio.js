@@ -322,6 +322,19 @@ const blogSection = {
   display: true // Set false to hide the blog section and the Blog menu link
 };
 
+// Services and Community pages (header links only, not on the homepage)
+const servicesSection = {
+  title: "Services",
+  subtitle: "What I do, the skills I bring and the projects I've built.",
+  display: true // Set false to hide the /services page and its menu link
+};
+
+const communitySection = {
+  title: "Community",
+  subtitle: "Publications, awards and places to connect with me.",
+  display: true // Set false to hide the /community page and its menu link
+};
+
 // Talks Sections
 
 const talkSection = {
@@ -370,6 +383,8 @@ const twitterDetails = {
 const isHireable = false; // Set false if you are not looking for a job. Also isHireable will be display as Open for opportunities: Yes/No in the GitHub footer
 
 export {
+  servicesSection,
+  communitySection,
   illustration,
   greeting,
   socialMediaLinks,

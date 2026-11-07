@@ -6,24 +6,24 @@ import StyleContext from "../../contexts/StyleContext";
 import {Link} from "../../utils/router";
 import {
   greeting,
-  workExperiences,
   skillsSection,
   bigProjects,
   blogSection,
   talkSection,
-  achievementSection,
-  resumeSection
+  resumeSection,
+  servicesSection,
+  communitySection
 } from "../../portfolio";
 
 function Header() {
   const {isDark} = useContext(StyleContext);
-  const viewExperience = workExperiences.display;
   const viewProjects = bigProjects.display;
   const viewSkills = skillsSection.display;
-  const viewAchievement = achievementSection.display;
   const viewBlog = blogSection.display;
   const viewTalks = talkSection.display;
   const viewResume = resumeSection.display;
+  const viewServices = servicesSection.display;
+  const viewCommunity = communitySection.display;
 
   return (
     <Headroom>
@@ -47,24 +47,19 @@ function Header() {
               <Link to="/#skills">Skills</Link>
             </li>
           )}
-          {viewExperience && (
-            <li>
-              <Link to="/#experience">Experience</Link>
-            </li>
-          )}
           {viewProjects && (
             <li>
               <Link to="/#projects">Projects</Link>
             </li>
           )}
-          {viewAchievement && (
-            <li>
-              <Link to="/#achievements">Achievements</Link>
-            </li>
-          )}
           {viewBlog && (
             <li>
               <Link to="/blog">Blog</Link>
+            </li>
+          )}
+          {viewCommunity && (
+            <li>
+              <Link to="/community">Community</Link>
             </li>
           )}
           {viewTalks && (
@@ -75,6 +70,11 @@ function Header() {
           {viewResume && (
             <li>
               <Link to="/#resume">Resume</Link>
+            </li>
+          )}
+          {viewServices && (
+            <li>
+              <Link to="/services">Services</Link>
             </li>
           )}
           <li>

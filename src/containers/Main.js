@@ -20,6 +20,7 @@ import Twitter from "./twitter-embed/twitter";
 import Profile from "./profile/Profile";
 import SplashScreen from "./splashScreen/SplashScreen";
 import {BlogIndex, BlogPost, NotFound} from "./blogPage/BlogPage";
+import {ServicesPage, CommunityPage} from "./sitePages/SitePages";
 import {useLocation, matchRoute} from "../utils/router";
 import {splashScreen} from "../portfolio";
 import {StyleProvider} from "../contexts/StyleContext";
@@ -76,6 +77,8 @@ const Main = () => {
             <Header />
             {route.name === "blogIndex" && <BlogIndex />}
             {route.name === "blogPost" && <BlogPost slug={route.slug} />}
+            {route.name === "services" && <ServicesPage />}
+            {route.name === "community" && <CommunityPage />}
             {route.name === "notFound" && <NotFound />}
             <Footer />
             <ScrollToTopButton />
