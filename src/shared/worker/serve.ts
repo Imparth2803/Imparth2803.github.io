@@ -1,5 +1,5 @@
 import {UserError} from "../text/userError";
-import type {Handlers, WorkerRequest, WorkerResponse} from "./protocol";
+import {Handlers, Transfer, WorkerRequest, WorkerResponse} from "./protocol";
 
 const GENERIC_ERROR =
   "Something went wrong while working on this. The file may be damaged or in an unexpected format. Try saving it again, or paste the text instead.";
@@ -14,15 +14,21 @@ export function serve(handlers: Handlers): void {
   scope.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     const {id, method, payload} = event.data;
     let response: WorkerResponse;
+    let transfer: Transferable[] = [];
     try {
       const handler = handlers[method];
       if (!handler) throw new Error(`Unknown worker method: ${method}`);
-      response = {id, ok: true, result: await handler(payload)};
+      let result = await handler(payload);
+      if (result instanceof Transfer) {
+        transfer = result.transfer;
+        result = result.value;
+      }
+      response = {id, ok: true, result};
     } catch (error) {
       if (!(error instanceof UserError)) console.error(error);
       response = {id, ok: false, message: messageFor(error)};
     }
-    scope.postMessage(response);
+    scope.postMessage(response, transfer);
   };
 }
 

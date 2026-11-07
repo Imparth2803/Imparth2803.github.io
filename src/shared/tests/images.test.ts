@@ -1,4 +1,4 @@
-import {readImageHeader} from "../images/header";
+import {readImageHeader, readInputHeader} from "../images/header";
 import {outputName, uniqueNames} from "../images/names";
 import {WorkerPool} from "../worker/WorkerPool";
 
@@ -110,6 +110,58 @@ describe("image headers", () => {
         new TextEncoder().encode("this is a text file renamed .png")
       )
     ).toBeNull();
+  });
+});
+
+describe("other image types the editor can open", () => {
+  const bytes = (...parts: (string | number[])[]) =>
+    new Uint8Array(
+      parts.flatMap(p =>
+        typeof p === "string" ? Array.from(p, c => c.charCodeAt(0)) : p
+      )
+    );
+
+  it("reads GIF, BMP and AVIF sizes", () => {
+    expect(readInputHeader(bytes("GIF89a", [0x40, 0x01, 0xf0, 0x00]))).toEqual({
+      type: "gif",
+      width: 320,
+      height: 240,
+      orientation: 1
+    });
+    const bmp = new Uint8Array(30);
+    bmp.set(bytes("BM"));
+    new DataView(bmp.buffer).setInt32(18, 640, true);
+    new DataView(bmp.buffer).setInt32(22, -480, true); // stored top-down
+    expect(readInputHeader(bmp)).toEqual({
+      type: "bmp",
+      width: 640,
+      height: 480,
+      orientation: 1
+    });
+    const box = (w: number, h: number) => {
+      const b = new Uint8Array(20);
+      b.set(bytes([0, 0, 0, 20], "ispe"));
+      new DataView(b.buffer).setUint32(12, w);
+      new DataView(b.buffer).setUint32(16, h);
+      return Array.from(b);
+    };
+    // A small preview first, then the real picture: the larger one wins.
+    const avif = bytes(
+      [0, 0, 0, 24],
+      "ftypavif",
+      box(160, 120),
+      box(4000, 3000)
+    );
+    expect(readInputHeader(avif)).toEqual({
+      type: "avif",
+      width: 4000,
+      height: 3000,
+      orientation: 1
+    });
+  });
+
+  it("isn't offered to tools that can only save JPG, PNG and WebP", () => {
+    expect(readImageHeader(bytes("GIF89a", [1, 0, 1, 0]))).toBeNull();
   });
 });
 

@@ -31,7 +31,8 @@ export function watchNetwork(page: Page) {
 
 export async function openTool(page: Page, slug: string) {
   await page.goto(`/services/${slug}`);
-  await expect(page.getByRole("heading", {level: 2, name: /^1/})).toBeVisible();
+  // Every tool's page has a .tool (numbered steps) or .editor root.
+  await expect(page.locator(".tool, .editor").first()).toBeVisible();
 }
 
 export async function saveDownload(
@@ -96,4 +97,29 @@ export async function longestBlock(
     clearInterval(w.__timer);
     return w.__longest;
   });
+}
+
+/* Decodes an image file in the page and returns its size and the colours
+   at the given points (as [r, g, b, a]). */
+export async function pixels(
+  page: Page,
+  bytes: Buffer,
+  points: [number, number][]
+) {
+  return page.evaluate(
+    async ({data, points}) => {
+      const bitmap = await createImageBitmap(new Blob([new Uint8Array(data)]));
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+      ctx.drawImage(bitmap, 0, 0);
+      return {
+        width: bitmap.width,
+        height: bitmap.height,
+        colours: points.map(([x, y]) =>
+          Array.from(ctx.getImageData(x, y, 1, 1).data)
+        )
+      };
+    },
+    {data: Array.from(bytes), points}
+  );
 }

@@ -33,7 +33,13 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
   );
 
   return (
-    <main className="blog-page service-page-live">
+    <main
+      className={
+        service.wide
+          ? "blog-page service-page-live service-page-wide"
+          : "blog-page service-page-live"
+      }
+    >
       <div className="blog-page-bar">
         <Link to="/services" className="blog-page-back">
           ← All tools
@@ -90,6 +96,8 @@ function aboutLimits(limits: ServiceLimits): string {
       )} rows at a time.`;
     case "images":
       return `It works with up to ${limits.maxFiles} images at a time (${limits.maxFilesMobile} on phones and tablets), each up to ${limits.maxFileMB} MB and ${limits.maxMegapixels} megapixels (${limits.maxMegapixelsMobile} on phones and tablets).`;
+    case "editor":
+      return `It works with images up to ${limits.maxFileMB} MB and ${limits.maxMegapixels} megapixels (${limits.maxFileMBMobile} MB and ${limits.maxMegapixelsMobile} megapixels on phones and tablets).`;
     case "pdf":
       return `It works with up to ${limits.maxFiles} PDFs at a time, ${
         limits.maxTotalMB

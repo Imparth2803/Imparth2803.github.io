@@ -3,8 +3,8 @@ import {filterServices} from "../catalogSearch";
 import {matchRoute} from "../../utils/router";
 
 describe("service registry", () => {
-  it("lists the 10 planned tools", () => {
-    expect(services).toHaveLength(10);
+  it("lists the 11 tools (10 planned, plus the image editor)", () => {
+    expect(services).toHaveLength(11);
   });
 
   it("gives every tool a unique, URL-safe slug", () => {
@@ -61,7 +61,8 @@ describe("catalog search", () => {
   it("filters by category", () => {
     expect(names("", "Images")).toEqual([
       "Bulk Image Resizer",
-      "Smart Image Compressor"
+      "Smart Image Compressor",
+      "Image Editor"
     ]);
   });
 });

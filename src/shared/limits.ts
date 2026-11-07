@@ -41,7 +41,15 @@ export interface PdfLimits extends FileLimits {
   maxPagesMobile: number;
 }
 
-export type ServiceLimits = TextLimits | ImageLimits | PdfLimits;
+/** Limits for the image editor: one image at a time, edited in several
+    steps, so it holds about three full-size copies in memory. */
+export interface EditorLimits extends FileLimits {
+  kind: "editor";
+  maxMegapixels: number;
+  maxMegapixelsMobile: number;
+}
+
+export type ServiceLimits = TextLimits | ImageLimits | PdfLimits | EditorLimits;
 
 export function isSmallDevice(): boolean {
   return (

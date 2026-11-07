@@ -259,6 +259,6 @@ test.describe("problems are explained in plain words", () => {
     await expect(page.getByRole("alert")).toContainText("ran into a problem");
     await page.unroute(/\/static\/js\/.*\.chunk\.js$/);
     await page.getByRole("link", {name: "← All tools"}).click();
-    await expect(page.locator(".service-card")).toHaveCount(10);
+    await expect(page.locator(".service-card")).toHaveCount(11);
   });
 });

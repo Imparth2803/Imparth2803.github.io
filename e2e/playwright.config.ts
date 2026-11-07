@@ -32,10 +32,17 @@ export default defineConfig({
       testIgnore: /performance/
     },
     {
+      // Safari's engine. Close to Safari, but not the same as testing in
+      // Safari itself.
+      name: "webkit",
+      use: {...devices["Desktop Safari"]},
+      testIgnore: /performance/
+    },
+    {
       name: "timing-chromium",
       use: {...devices["Desktop Chrome"]},
       testMatch: /performance/,
-      dependencies: ["chromium", "firefox"]
+      dependencies: ["chromium", "firefox", "webkit"]
     },
     {
       name: "timing-firefox",

@@ -182,3 +182,39 @@ test("PDF Page Organizer: a 400-page PDF", async ({page}) => {
   });
   report("PDF Page Organizer, saving 400 pages", saveBlocked);
 });
+
+test("Image Editor: a 24-megapixel photo", async ({page}) => {
+  await openTool(page, "image-editor");
+  // Draw a 6000 × 4000 JPG in the page (no fixture this size in the repo).
+  const bytes = await page.evaluate(async () => {
+    const canvas = new OffscreenCanvas(6000, 4000);
+    const ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+    for (let i = 0; i < 400; i++) {
+      ctx.fillStyle = `hsl(${i * 37} 70% 50%)`;
+      ctx.fillRect((i * 151) % 6000, (i * 97) % 4000, 600, 400);
+    }
+    const blob = await canvas.convertToBlob({type: "image/jpeg", quality: 0.9});
+    return Array.from(new Uint8Array(await blob.arrayBuffer()));
+  });
+  const blocked = await longestBlock(page, async () => {
+    await page.locator("#editor-files").setInputFiles({
+      name: "big.jpg",
+      mimeType: "image/jpeg",
+      buffer: Buffer.from(bytes)
+    });
+    await expect(page.locator(".editor-status")).toContainText(
+      "6,000 × 4,000",
+      {timeout: 30_000}
+    );
+    for (const angle of ["5", "-12", "20"]) {
+      await page.getByLabel("Straighten, in degrees").fill(angle);
+      await page.waitForTimeout(100);
+    }
+    await page.getByRole("button", {name: "Turn right"}).click();
+    await page.getByRole("button", {name: "Save", exact: true}).first().click();
+    await expect(
+      page.locator(".editor-panel").getByRole("button", {name: /^Download/})
+    ).toBeEnabled({timeout: 30_000});
+  });
+  report("Image Editor, 24 megapixels", blocked);
+});

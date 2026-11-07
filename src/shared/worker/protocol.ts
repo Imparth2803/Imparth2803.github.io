@@ -12,3 +12,12 @@ export interface WorkerRequest {
 export type WorkerResponse =
   | {id: number; ok: true; result: unknown}
   | {id: number; ok: false; message: string};
+
+/* A worker result whose large parts (such as an ImageBitmap) are handed
+   over to the page instead of copied. */
+export class Transfer<T> {
+  constructor(readonly value: T, readonly transfer: Transferable[]) {}
+}
+
+/** What the page receives for a handler's return value. */
+export type Received<R> = R extends Transfer<infer T> ? T : R;

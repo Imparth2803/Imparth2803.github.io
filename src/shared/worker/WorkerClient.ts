@@ -1,4 +1,9 @@
-import type {Handlers, WorkerRequest, WorkerResponse} from "./protocol";
+import type {
+  Handlers,
+  Received,
+  WorkerRequest,
+  WorkerResponse
+} from "./protocol";
 
 /* An error to show as-is: it already carries a plain-language message. */
 export class ToolError extends Error {}
@@ -23,7 +28,7 @@ export class WorkerClient<H extends Handlers> {
   call<K extends keyof H & string>(
     method: K,
     payload: Parameters<H[K]>[0]
-  ): Promise<Awaited<ReturnType<H[K]>>> {
+  ): Promise<Received<Awaited<ReturnType<H[K]>>>> {
     const worker = this.ensureWorker();
     const id = this.nextId++;
     return new Promise((resolve, reject) => {

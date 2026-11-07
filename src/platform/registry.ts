@@ -8,6 +8,7 @@
 
 import type {ComponentType} from "react";
 import type {
+  EditorLimits,
   ImageLimits,
   PdfLimits,
   ServiceLimits,
@@ -44,6 +45,8 @@ interface ServiceBase {
   icon: string;
   /** Title and description for search engines and link previews. */
   seo: {title: string; description: string};
+  /** Uses the full page width (for tools with a large workspace). */
+  wide?: true;
 }
 
 /** A tool, with the limits it works within and how to load its code. */
@@ -52,6 +55,7 @@ export type ServiceDefinition = ServiceBase &
     | {limits: TextLimits; load: ToolLoader<TextLimits>}
     | {limits: ImageLimits; load: ToolLoader<ImageLimits>}
     | {limits: PdfLimits; load: ToolLoader<PdfLimits>}
+    | {limits: EditorLimits; load: ToolLoader<EditorLimits>}
   );
 
 /* Text and list tools: the work runs in a background worker, so these
@@ -73,6 +77,15 @@ const IMAGE_TOOL_LIMITS: ImageLimits = {
   maxFilesMobile: 60,
   maxMegapixels: 100,
   maxMegapixelsMobile: 40
+};
+
+/* The image editor keeps the original plus working copies of one image. */
+const IMAGE_EDITOR_LIMITS: EditorLimits = {
+  kind: "editor",
+  maxFileMB: 50,
+  maxFileMBMobile: 25,
+  maxMegapixels: 50,
+  maxMegapixelsMobile: 24
 };
 
 /* PDF tools: an open PDF is held in memory twice at most (once for the
@@ -202,6 +215,34 @@ export const services: readonly ServiceDefinition[] = [
     },
     limits: IMAGE_TOOL_LIMITS,
     load: () => import("../services/smart-image-compressor")
+  },
+  {
+    slug: "image-editor",
+    name: "Image Editor",
+    summary: "Turn, flip and edit an image, then save it as JPG, PNG or WebP.",
+    description:
+      "Open an image and edit it on screen: turn it, flip it or straighten it. Every change can be undone, and the original is never changed. Then save it as a JPG, PNG or WebP file, with the quality you choose.",
+    category: "Images",
+    keywords: [
+      "edit",
+      "rotate",
+      "flip",
+      "mirror",
+      "straighten",
+      "convert",
+      "png to jpg",
+      "jpg to png",
+      "webp"
+    ],
+    icon: "fas fa-sliders-h",
+    seo: {
+      title: "Image Editor: rotate, flip and convert images",
+      description:
+        "Rotate, flip and convert images to JPG, PNG or WebP. Free, and your images never leave your browser."
+    },
+    wide: true,
+    limits: IMAGE_EDITOR_LIMITS,
+    load: () => import("../services/image-editor")
   },
   {
     slug: "text-formatter",

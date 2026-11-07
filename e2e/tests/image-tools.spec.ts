@@ -1,31 +1,10 @@
 import {expect, Page, test} from "@playwright/test";
 import {unzipSync} from "fflate";
-import {fixture, openTool, saveDownload, watchNetwork} from "./helpers";
+import {fixture, openTool, pixels, saveDownload, watchNetwork} from "./helpers";
 
 async function addImages(page: Page, inputId: string, files: string[]) {
   await page.locator(`#${inputId}-files`).setInputFiles(files.map(fixture));
   await expect(page.getByText(/images? added/)).toBeVisible();
-}
-
-/* Decodes an image file in the page and returns its size and the colours
-   at the given points (as [r, g, b, a]). */
-async function pixels(page: Page, bytes: Buffer, points: [number, number][]) {
-  return page.evaluate(
-    async ({data, points}) => {
-      const bitmap = await createImageBitmap(new Blob([new Uint8Array(data)]));
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-      const ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
-      ctx.drawImage(bitmap, 0, 0);
-      return {
-        width: bitmap.width,
-        height: bitmap.height,
-        colours: points.map(([x, y]) =>
-          Array.from(ctx.getImageData(x, y, 1, 1).data)
-        )
-      };
-    },
-    {data: Array.from(bytes), points}
-  );
 }
 
 /* A field by its exact visible label (labels here also contain option
@@ -231,7 +210,14 @@ test.describe("Smart Image Compressor", () => {
     expect(out.bytes.length).toBeLessThanOrEqual(8 * 1024);
   });
 
-  test("offers WebP when a PNG can't reach the target", async ({page}) => {
+  test("offers WebP when a PNG can't reach the target", async ({
+    page,
+    browserName
+  }) => {
+    test.skip(
+      browserName === "webkit",
+      "Safari can't save WebP, so the tool rightly doesn't offer it there."
+    );
     await openTool(page, "smart-image-compressor");
     await addImages(page, "compressor-input", ["screenshot.png"]);
     await page.getByRole("button", {name: "A file size"}).click();

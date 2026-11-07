@@ -1,0 +1,290 @@
+@import "../../../_globalColor";
+
+/* Image Editor: top bar, tool list, image in the middle, settings panel,
+   and a status line. On small screens the tools become a scrolling strip
+   and the settings sit under the image. */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: $inkSoft;
+}
+
+.editor-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid $hairline;
+  border-bottom: 1px solid $hairline;
+}
+.editor-file {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  color: $ink;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.editor-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.editor-topbar .tool-button,
+.editor-panel .tool-button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.editor-main {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: start;
+}
+
+.editor-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.editor-tools button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid $hairline;
+  background: transparent;
+  font-size: 12px;
+  line-height: 1.3;
+  color: $inkSoft;
+  cursor: pointer;
+}
+.editor-tools button i {
+  font-size: 18px;
+}
+.editor-tools button:hover {
+  border-color: $accent1;
+  color: $accent1;
+}
+.editor-tools button[aria-pressed="true"] {
+  border-color: $accent1;
+  background-color: $accent1;
+  color: #fff;
+}
+
+.editor-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.editor-workspace-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+.editor-zoom {
+  display: inline-flex;
+}
+.editor-zoom button,
+.editor-compare {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid $hairline;
+  background: transparent;
+  font-size: 13px;
+  color: $inkSoft;
+  cursor: pointer;
+}
+.editor-zoom button + button {
+  border-left: 0;
+}
+.editor-zoom button[aria-pressed="true"],
+.editor-compare[aria-pressed="true"] {
+  background-color: $accentSoft;
+  color: $ink;
+  font-weight: 600;
+}
+.editor-zoom button:disabled,
+.editor-compare:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* A checkerboard behind the image shows see-through areas. */
+.editor-stage {
+  position: relative;
+  display: flex;
+  height: min(70vh, 720px);
+  overflow: auto;
+  border: 1px solid $hairline;
+  background: repeating-conic-gradient(#e9e9e9 0% 25%, #fff 0% 50%) 50% / 20px
+    20px;
+}
+.editor-stage:focus-visible,
+.editor-tools button:focus-visible,
+.editor-zoom button:focus-visible,
+.editor-compare:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
+}
+.editor-canvas {
+  /* Centred, and scrollable on every side when zoomed in. */
+  margin: auto;
+  flex: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.editor-stage-error {
+  position: absolute;
+  inset: auto 12px 12px;
+  margin: 0;
+  padding: 10px 14px;
+  border-left: 3px solid #c62828;
+  background-color: #fff;
+  color: #b71c1c;
+}
+
+.editor-panel {
+  padding: 14px;
+  border: 1px solid $hairline;
+}
+.editor-panel h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: $ink;
+}
+.editor-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.editor-panel-body .tool-field-hint {
+  margin: 0;
+}
+.editor-button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.editor-button-grid .tool-button {
+  justify-content: center;
+  text-align: center;
+}
+.editor-slider-row,
+.editor-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.editor-slider-row input[type="range"],
+.editor-panel input[type="range"] {
+  flex: 1;
+  accent-color: $accent1;
+}
+.editor-number {
+  width: 76px;
+  padding: 6px 8px;
+}
+.editor-name-row .tool-input {
+  flex: 1;
+  min-width: 0;
+}
+.editor-save-result p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.editor-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid $hairline;
+  font-size: 13px;
+}
+.editor-status div {
+  display: flex;
+  gap: 6px;
+}
+.editor-status dt {
+  color: $inkMuted;
+}
+.editor-status dd {
+  margin: 0;
+  color: $ink;
+}
+
+@media (max-width: 900px) {
+  .editor-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor-tools {
+    flex-direction: row;
+    overflow-x: auto;
+    order: 1;
+  }
+  .editor-tools button {
+    flex: 0 0 auto;
+    min-width: 96px;
+  }
+  .editor-workspace {
+    order: 0;
+  }
+  .editor-panel {
+    order: 2;
+  }
+  .editor-stage {
+    height: 55vh;
+  }
+}
+
+.dark-mode {
+  .editor {
+    color: $inkSoftDark;
+  }
+  .editor-topbar,
+  .editor-tools button,
+  .editor-zoom button,
+  .editor-compare,
+  .editor-stage,
+  .editor-panel,
+  .editor-status {
+    border-color: $hairlineDark;
+  }
+  .editor-tools button,
+  .editor-zoom button,
+  .editor-compare {
+    color: $inkSoftDark;
+  }
+  .editor-tools button:hover {
+    border-color: $accentLight;
+    color: $accentLight;
+  }
+  .editor-tools button[aria-pressed="true"] {
+    border-color: $accentLight;
+    background-color: $accentLight;
+    color: $darkBackground;
+  }
+  .editor-zoom button[aria-pressed="true"],
+  .editor-compare[aria-pressed="true"] {
+    background-color: $accentSoftDark;
+    color: $textColorDark;
+  }
+  .editor-file,
+  .editor-panel h2,
+  .editor-status dd {
+    color: $textColorDark;
+  }
+  .editor-status dt {
+    color: $inkMutedDark;
+  }
+}

@@ -13,7 +13,31 @@ export const IMAGE_TYPES: Record<
   webp: {mime: "image/webp", ext: "webp", label: "WebP"}
 };
 
-export interface ImageHeader {
+/** Types the browser can open but that are not offered for saving. */
+export type InputType = ImageType | "gif" | "bmp" | "avif";
+
+export const INPUT_TYPES: Record<InputType, {label: string; exts: string[]}> = {
+  jpeg: {label: "JPG", exts: ["jpg", "jpeg"]},
+  png: {label: "PNG", exts: ["png"]},
+  webp: {label: "WebP", exts: ["webp"]},
+  gif: {label: "GIF", exts: ["gif"]},
+  bmp: {label: "BMP", exts: ["bmp"]},
+  avif: {label: "AVIF", exts: ["avif"]}
+};
+
+export const isImageType = (type: InputType): type is ImageType =>
+  type in IMAGE_TYPES;
+
+export interface InputHeader {
+  type: InputType;
+  /** Size as the photo is meant to be seen (after its rotation is applied). */
+  width: number;
+  height: number;
+  /** EXIF orientation (1 = upright). */
+  orientation: number;
+}
+
+export interface ImageHeader extends InputHeader {
   type: ImageType;
   /** Size as the photo is meant to be seen (after its rotation is applied). */
   width: number;
@@ -27,7 +51,13 @@ const u16le = (b: Uint8Array, i: number) => b[i]! | (b[i + 1]! << 8);
 const u32be = (b: Uint8Array, i: number) =>
   ((b[i]! << 24) >>> 0) + (b[i + 1]! << 16) + (b[i + 2]! << 8) + b[i + 3]!;
 
+/** JPG, PNG and WebP only: the types the image tools can also save. */
 export function readImageHeader(b: Uint8Array): ImageHeader | null {
+  const header = readInputHeader(b);
+  return header && isImageType(header.type) ? (header as ImageHeader) : null;
+}
+
+export function readInputHeader(b: Uint8Array): InputHeader | null {
   if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return jpeg(b);
   if (
     b[0] === 0x89 &&
@@ -47,10 +77,53 @@ export function readImageHeader(b: Uint8Array): ImageHeader | null {
     String.fromCharCode(...Array.from(b.subarray(i, i + n)));
   if (b.length >= 30 && ascii(0, 4) === "RIFF" && ascii(8, 4) === "WEBP")
     return webp(b, ascii(12, 4));
+  if (b.length >= 10 && /^GIF8[79]a$/.test(ascii(0, 6))) {
+    return {
+      type: "gif",
+      width: u16le(b, 6),
+      height: u16le(b, 8),
+      orientation: 1
+    };
+  }
+  if (b.length >= 26 && ascii(0, 2) === "BM") {
+    const i32 = (i: number) =>
+      b[i]! | (b[i + 1]! << 8) | (b[i + 2]! << 16) | (b[i + 3]! << 24);
+    return {
+      type: "bmp",
+      width: Math.abs(i32(18)),
+      height: Math.abs(i32(22)), // negative means stored top-down
+      orientation: 1
+    };
+  }
+  if (b.length >= 12 && ascii(4, 4) === "ftyp" && /^avi[fs]$/.test(ascii(8, 4)))
+    return avif(b);
   return null;
 }
 
-function webp(b: Uint8Array, chunk: string): ImageHeader | null {
+/* AVIF keeps its size in "ispe" boxes (one per picture, including any
+   small preview); the largest is the image itself. */
+function avif(b: Uint8Array): InputHeader | null {
+  let width = 0;
+  let height = 0;
+  for (let i = 0; i + 16 <= b.length; i++) {
+    if (
+      b[i] === 0x69 &&
+      b[i + 1] === 0x73 &&
+      b[i + 2] === 0x70 &&
+      b[i + 3] === 0x65
+    ) {
+      const w = u32be(b, i + 8);
+      const h = u32be(b, i + 12);
+      if (w * h > width * height) {
+        width = w;
+        height = h;
+      }
+    }
+  }
+  return width && height ? {type: "avif", width, height, orientation: 1} : null;
+}
+
+function webp(b: Uint8Array, chunk: string): InputHeader | null {
   let width: number;
   let height: number;
   if (chunk === "VP8 ") {
@@ -69,7 +142,7 @@ function webp(b: Uint8Array, chunk: string): ImageHeader | null {
   return {type: "webp", width, height, orientation: 1};
 }
 
-function jpeg(b: Uint8Array): ImageHeader | null {
+function jpeg(b: Uint8Array): InputHeader | null {
   let orientation = 1;
   let i = 2;
   while (i + 9 < b.length) {
@@ -138,9 +211,18 @@ function exifOrientation(
 
 /* Reads enough of a file to find its header (JPEG headers can sit after a
    large embedded thumbnail). */
-export async function readFileHeader(file: Blob): Promise<ImageHeader | null> {
+async function readHeaderOf<H>(
+  file: Blob,
+  read: (b: Uint8Array) => H | null
+): Promise<H | null> {
   const first = await file.slice(0, 256 * 1024).arrayBuffer();
-  const header = readImageHeader(new Uint8Array(first));
+  const header = read(new Uint8Array(first));
   if (header || file.size <= 256 * 1024) return header;
-  return readImageHeader(new Uint8Array(await file.arrayBuffer()));
+  return read(new Uint8Array(await file.arrayBuffer()));
 }
+
+export const readFileHeader = (file: Blob) =>
+  readHeaderOf(file, readImageHeader);
+
+export const readFileInputHeader = (file: Blob) =>
+  readHeaderOf(file, readInputHeader);

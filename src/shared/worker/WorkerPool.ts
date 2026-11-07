@@ -1,4 +1,4 @@
-import type {Handlers} from "./protocol";
+import type {Handlers, Received} from "./protocol";
 import {CancelledError, WorkerClient} from "./WorkerClient";
 
 interface Job {
@@ -37,7 +37,7 @@ export class WorkerPool<H extends Handlers> {
     method: K,
     payload: Parameters<H[K]>[0],
     weight = 0
-  ): Promise<Awaited<ReturnType<H[K]>>> {
+  ): Promise<Received<Awaited<ReturnType<H[K]>>>> {
     return new Promise((resolve, reject) => {
       this.queue.push({
         method,
