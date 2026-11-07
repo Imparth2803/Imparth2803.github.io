@@ -2,19 +2,24 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 
+// A plain function, not jest.fn(): CRA resets mock implementations before
+// each test, which would make matchMedia return undefined.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: query => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // Deprecated
-    removeListener: jest.fn(), // Deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn()
-  }))
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false
+  })
 });
+
+// jsdom has no scrolling; Main scrolls to the top after each page change.
+window.scrollTo = () => {};
 
 it("renders without crashing", () => {
   const div = document.createElement("div");

@@ -1,17 +1,33 @@
 import React, {useEffect, useState} from "react";
+import {findService, ServiceDefinition} from "../platform/registry";
 
-/* Tiny client-side router (no dependency): the portfolio lives at "/" and the
-   blog at "/blog" and "/blog/<slug>". GitHub Pages serves 404.html for deep
-   links, which bounces back to index.html with the original path restored
-   (see public/404.html and the script in public/index.html). */
+/* Tiny client-side router (no dependency): the portfolio lives at "/", the
+   blog at "/blog" and "/blog/<slug>", and the tools at "/services" and
+   "/services/<slug>" (slugs come from the service registry). GitHub Pages
+   serves 404.html for deep links, which bounces back to index.html with the
+   original path restored (see public/404.html and public/spa-redirect.js). */
 
 const NAV_EVENT = "app:navigate";
 
-function currentLocation() {
+interface AppLocation {
+  path: string;
+  hash: string;
+}
+
+export type Route =
+  | {name: "home"}
+  | {name: "blogIndex"}
+  | {name: "blogPost"; slug: string}
+  | {name: "community"}
+  | {name: "services"}
+  | {name: "service"; service: ServiceDefinition}
+  | {name: "notFound"};
+
+function currentLocation(): AppLocation {
   return {path: window.location.pathname, hash: window.location.hash};
 }
 
-export function navigate(to) {
+export function navigate(to: string): void {
   const target = new URL(to, window.location.origin);
   if (
     target.pathname === window.location.pathname &&
@@ -26,7 +42,7 @@ export function navigate(to) {
   window.dispatchEvent(new Event(NAV_EVENT));
 }
 
-export function useLocation() {
+export function useLocation(): AppLocation {
   const [location, setLocation] = useState(currentLocation);
   useEffect(() => {
     const update = () => setLocation(currentLocation());
@@ -41,21 +57,26 @@ export function useLocation() {
 }
 
 /* Matches the current path against the app's routes. */
-export function matchRoute(path) {
+export function matchRoute(path: string): Route {
   const clean = path.replace(/\/+$/, "") || "/";
-  if (clean === "/blog") return {name: "blogIndex"};
-  if (clean === "/services") return {name: "services"};
-  if (clean === "/community") return {name: "community"};
-  const post = clean.match(/^\/blog\/([\w-]+)$/);
-  if (post) return {name: "blogPost", slug: post[1]};
   if (clean === "/") return {name: "home"};
+  if (clean === "/blog") return {name: "blogIndex"};
+  if (clean === "/community") return {name: "community"};
+  if (clean === "/services") return {name: "services"};
+  const tool = clean.match(/^\/services\/([\w-]+)$/);
+  const service = tool?.[1] ? findService(tool[1]) : undefined;
+  if (service) return {name: "service", service};
+  const post = clean.match(/^\/blog\/([\w-]+)$/);
+  if (post?.[1]) return {name: "blogPost", slug: post[1]};
   return {name: "notFound"};
 }
 
+type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {to: string};
+
 /* <a> that navigates without a page reload (falls back to normal behaviour
    for modified clicks, e.g. open in new tab). */
-export function Link({to, onClick, children, ...rest}) {
-  const handleClick = event => {
+export function Link({to, onClick, children, ...rest}: LinkProps) {
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(event);
     if (
       event.defaultPrevented ||

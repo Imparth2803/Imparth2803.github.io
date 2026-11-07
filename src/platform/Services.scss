@@ -1,0 +1,252 @@
+@import "../_globalColor";
+
+/* Shared by the /services catalog and tool pages. Page frame, breadcrumb bar
+   and title come from the blog page styles (containers/blogPage). */
+
+.services-privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 8px 14px;
+  border: 1px solid $hairline;
+  background-color: $accentSoft;
+  font-size: 15px;
+  color: $inkSoft;
+}
+.services-privacy i {
+  color: $accent1;
+}
+
+.services-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+  margin-bottom: 12px;
+}
+.services-search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 260px;
+}
+.services-search-label {
+  font-family: $monoFont;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $inkMuted;
+}
+.services-search input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid $hairline;
+  background-color: $lightBackground1;
+  font: inherit;
+  font-size: 16px; // 16px stops iOS zooming in on focus
+  color: $ink;
+}
+.services-search input:focus-visible,
+.services-chip:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
+}
+.services-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.services-chip {
+  padding: 8px 12px;
+  border: 1px solid $hairline;
+  background: transparent;
+  font-family: $monoFont;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $inkSoft;
+  cursor: pointer;
+}
+.services-chip:hover {
+  border-color: $accent1;
+}
+.services-chip[aria-pressed="true"] {
+  border-color: $accent1;
+  background-color: $accent1;
+  color: #fff;
+}
+.services-count {
+  margin: 0 0 20px;
+  font-family: $monoFont;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: $inkMuted;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.services-grid li {
+  display: flex;
+}
+.service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 22px 44px 22px 22px;
+  border: 1px solid $hairline;
+  background-color: $lightBackground1;
+  color: $inkSoft;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.service-card:hover,
+.service-card:focus-visible {
+  border-color: $accent1;
+  transform: translateY(-2px);
+}
+.service-card:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
+}
+.service-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-family: $monoFont;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $inkMuted;
+}
+.service-card-top i {
+  font-size: 18px;
+  color: $accent1;
+}
+.service-card-status {
+  padding: 1px 6px;
+  border: 1px solid $accent2;
+  color: $accent2;
+}
+.service-card-name {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: $ink;
+}
+.service-card-summary {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.service-card-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 18px;
+  color: $inkMuted;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.service-card:hover .service-card-arrow {
+  color: $accent1;
+  transform: translateX(3px);
+}
+
+/* Tool page */
+.service-page-icon {
+  margin-right: 16px;
+  font-size: 0.75em;
+  color: $accent1;
+}
+.service-page-section,
+.service-page-soon {
+  margin-bottom: 32px;
+  font-size: 18px;
+  line-height: 1.7;
+}
+.service-page-section h2,
+.service-page-soon h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: $ink;
+}
+.service-page-section p,
+.service-page-soon p {
+  margin: 0;
+}
+.service-page-soon {
+  padding: 20px 24px;
+  border: 1px dashed $accent2;
+}
+.service-page-soon a {
+  color: $accent1;
+}
+
+/* Dark theme */
+.dark-mode {
+  .services-privacy,
+  .services-search input,
+  .services-chip,
+  .service-card {
+    border-color: $hairlineDark;
+  }
+  .services-privacy {
+    background-color: $accentSoftDark;
+    color: $inkSoftDark;
+  }
+  .services-search input,
+  .service-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    color: $inkSoftDark;
+  }
+  .services-chip,
+  .service-page-section,
+  .service-page-soon {
+    color: $inkSoftDark;
+  }
+  .services-chip[aria-pressed="true"] {
+    border-color: $accentLight;
+    background-color: $accentLight;
+    color: $darkBackground;
+  }
+  .services-search input,
+  .service-card-name,
+  .service-page-section h2,
+  .service-page-soon h2 {
+    color: $textColorDark;
+  }
+  .services-search-label,
+  .services-count,
+  .service-card-top,
+  .service-card-arrow {
+    color: $inkMutedDark;
+  }
+  .services-privacy i,
+  .service-card-top i,
+  .service-page-icon,
+  .service-page-soon a,
+  .service-card:hover .service-card-arrow {
+    color: $accentLight;
+  }
+  .service-card:hover,
+  .service-card:focus-visible {
+    border-color: $accentLight;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}

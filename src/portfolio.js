@@ -2,7 +2,6 @@
 
 // To change portfolio colors globally go to the  _globalColor.scss file
 
-import emoji from "react-easy-emoji";
 import splashAnimation from "./assets/lottie/splashAnimation"; // Rename to your file name for custom animation
 
 // Splash Screen
@@ -23,9 +22,8 @@ const greeting = {
   username: "Parth Tawde",
   title: "Hi all, I'm Parth",
   titleHighlight: "Parth", // Word in the title shown in the accent color
-  subTitle: emoji(
-    "Python developer and MSc Data Science graduate building AI, computer vision and automation tools 🚀"
-  ),
+  subTitle:
+    "Python developer and MSc Data Science graduate building AI, computer vision and automation tools 🚀",
   resumeLink: "resume", // Set to empty to hide the "Download my resume" button (file: src/containers/greeting/resume.pdf)
   displayGreeting: true // Set false to hide this section, defaults to true
 };
@@ -48,21 +46,11 @@ const skillsSection = {
   subTitle:
     "PYTHON DEVELOPER BUILDING AI, COMPUTER VISION AND AUTOMATION SOLUTIONS",
   skills: [
-    emoji(
-      "⚡ Build full-stack web applications with Django, React, FastAPI, Node.js and Express"
-    ),
-    emoji(
-      "⚡ Develop computer vision and image processing pipelines with OpenCV, Pillow and OCR"
-    ),
-    emoji(
-      "⚡ Create AI-powered applications with LangChain, LangGraph, Ollama and local LLMs"
-    ),
-    emoji(
-      "⚡ Train machine learning and deep learning models with TensorFlow, PyTorch, Keras and Scikit-learn"
-    ),
-    emoji(
-      "⚡ Automate design and product personalisation workflows with Playwright and Adobe tools"
-    )
+    "⚡ Build full-stack web applications with Django, React, FastAPI, Node.js and Express",
+    "⚡ Develop computer vision and image processing pipelines with OpenCV, Pillow and OCR",
+    "⚡ Create AI-powered applications with LangChain, LangGraph, Ollama and local LLMs",
+    "⚡ Train machine learning and deep learning models with TensorFlow, PyTorch, Keras and Scikit-learn",
+    "⚡ Automate design and product personalisation workflows with Playwright and Adobe tools"
   ],
 
   /* Make Sure to include correct Font Awesome Classname to view your icon
@@ -286,7 +274,7 @@ const bigProjects = {
 // Include certificates, talks etc
 
 const achievementSection = {
-  title: emoji("Achievements And Publications 🏆 "),
+  title: "Achievements And Publications 🏆 ",
   subtitle: "Publications, awards and activities",
 
   achievementsCards: [
@@ -325,8 +313,9 @@ const blogSection = {
 // Services and Community pages (header links only, not on the homepage)
 const servicesSection = {
   title: "Services",
-  subtitle: "What I do, the skills I bring and the projects I've built.",
-  display: true // Set false to hide the /services page and its menu link
+  subtitle:
+    "Free, simple tools for everyday office tasks: tidy lists, split text, convert spreadsheets, resize images and organise PDFs.",
+  display: true // Set false to hide the Services menu link (the tools are listed in src/platform/registry.ts)
 };
 
 const communitySection = {
@@ -347,7 +336,7 @@ const talkSection = {
 // Podcast Section
 
 const podcastSection = {
-  title: emoji("Podcast 🎙️"),
+  title: "Podcast 🎙️",
   subtitle: "",
 
   // Please Provide with Your Podcast embeded Link
@@ -365,7 +354,7 @@ const resumeSection = {
 };
 
 const contactInfo = {
-  title: emoji("Contact Me ☎️"),
+  title: "Contact Me ☎️",
   subtitle:
     "Discuss a project or just want to say hi? My Inbox is open for all.",
   number: "", // Add a phone number here to show it publicly

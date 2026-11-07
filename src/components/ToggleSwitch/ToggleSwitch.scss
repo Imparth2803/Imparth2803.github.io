@@ -7,8 +7,8 @@
   height: 26px;
 }
 
-/* Fix visible slider checkbox */
-input {
+/* Fix visible slider checkbox (scoped so other inputs keep their size) */
+.switch input {
   transform: scale(0.5);
 }
 
