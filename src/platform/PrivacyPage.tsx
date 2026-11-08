@@ -6,7 +6,7 @@ import {usePageMeta} from "./usePageMeta";
 
 /* /privacy: what the site keeps about people, in plain words. Keep it in step
    with what the code actually stores (src/platform/auth, supabase/migrations). */
-const UPDATED = "8 November 2026";
+const UPDATED = "9 November 2026";
 
 export default function PrivacyPage() {
   usePageMeta(
@@ -55,13 +55,28 @@ export default function PrivacyPage() {
           used for advertising.
         </p>
 
+        <h2>Feedback you send</h2>
+        <p>
+          Under each tool there's a form to rate it and leave a comment. If you
+          send it, we keep the rating, the comment, which tool it was about and
+          when you sent it, linked to your account so we can tell feedback from
+          different people apart. Nothing is sent unless you press{" "}
+          <strong>Send feedback</strong>, and the form never includes your files
+          or results. Please don't write personal details or your files'
+          contents in the comment.
+        </p>
+        <p>
+          Only the site's owner can read feedback. It's used to fix problems and
+          decide what to improve.
+        </p>
+
         <h2>Who stores it</h2>
         <p>
-          Accounts are run by <a href="https://supabase.com">Supabase</a>, on
-          its servers in the Asia-Pacific region. For security, Supabase also
-          records the IP address and browser used for each sign-in. The site
-          itself is hosted by GitHub Pages, which may log visitors' IP addresses
-          as described in{" "}
+          Accounts and feedback are stored by{" "}
+          <a href="https://supabase.com">Supabase</a>, on its servers in the
+          Asia-Pacific region. For security, Supabase also records the IP
+          address and browser used for each sign-in. The site itself is hosted
+          by GitHub Pages, which may log visitors' IP addresses as described in{" "}
           <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">
             GitHub's privacy statement
           </a>
@@ -79,8 +94,8 @@ export default function PrivacyPage() {
         <h2>Deleting your account</h2>
         <p>
           Once signed in, use <strong>Delete account</strong> at the top of any
-          tool page. It deletes your account and everything stored with it
-          straight away. You can also email{" "}
+          tool page. It deletes your account and everything stored with it,
+          including your feedback, straight away. You can also email{" "}
           <a href={`mailto:${email}`}>{email}</a> and we'll delete it for you.
         </p>
 

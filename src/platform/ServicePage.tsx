@@ -13,6 +13,7 @@ import {formatCount} from "../shared/text/numbers";
 import {AuthState, useAuth} from "./auth/session";
 import SignInPanel from "./auth/SignInPanel";
 import AccountBar from "./auth/AccountBar";
+import FeedbackForm from "./feedback/FeedbackForm";
 
 /* Each tool's code is fetched the first time its page opens, then reused.
    (Every loader is typed with the limits its tool takes; the registry
@@ -67,8 +68,8 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
   );
 }
 
-/* The tool itself only opens once the person is signed in. The description
-   below it is always shown. */
+/* The tool and its feedback form only open once the person is signed in.
+   The description below them is always shown. */
 function LiveTool({
   service,
   auth
@@ -80,6 +81,9 @@ function LiveTool({
   return (
     <>
       <ToolOrSignIn service={service} auth={auth} />
+      {auth.status === "signedIn" && (
+        <FeedbackForm toolSlug={service.slug} toolName={service.name} />
+      )}
       <section className="service-page-section service-page-about">
         <h2>About this tool</h2>
         <p>{service.description}</p>

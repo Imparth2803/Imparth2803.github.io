@@ -185,30 +185,39 @@ export async function signOut(): Promise<void> {
   await (await client()).signOut({scope: "local"});
 }
 
-/** Deletes the account and everything stored with it, then signs out. */
-export async function deleteAccount(): Promise<string | null> {
-  const auth = await client();
+/** Sends a signed-in request to the database's API (`path` is under
+    /rest/v1/). Returns null when nobody is signed in; throws when the
+    network fails. The library refreshes the sign-in first if it's stale. */
+export async function postToDatabase(
+  path: string,
+  body: unknown
+): Promise<Response | null> {
   const {
     data: {session}
-  } = await auth.getSession();
+  } = await (await client()).getSession();
   if (!session) return null;
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${session.access_token}`,
+      "Content-Type": "application/json",
+      // Don't send the saved row back: people can add rows but not read them.
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify(body)
+  });
+}
+
+/** Deletes the account and everything stored with it, then signs out. */
+export async function deleteAccount(): Promise<string | null> {
   try {
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/rpc/delete_my_account`,
-      {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json"
-        },
-        body: "{}"
-      }
-    );
+    const response = await postToDatabase("rpc/delete_my_account", {});
+    if (!response) return null;
     if (!response.ok) throw new Error(String(response.status));
   } catch {
     return "Your account couldn't be deleted just now. Please try again.";
   }
-  await auth.signOut({scope: "local"});
+  await signOut();
   return null;
 }

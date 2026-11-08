@@ -110,4 +110,15 @@ to talk to your Supabase project, and only that project.
 ## Where to see things
 
 - Accounts: **Authentication → Users**.
-- (Stage 2) Feedback and (Stage 3) usage: **Table Editor**.
+- Feedback (Stage 2, [`002_feedback.sql`](migrations/002_feedback.sql)): open
+  **Table Editor → feedback**. To see who sent each one, run this in the SQL
+  Editor:
+
+  ```sql
+  select f.created_at, f.tool, f.rating, f.comment, u.email
+  from public.feedback f
+  join auth.users u on u.id = f.user_id
+  order by f.created_at desc;
+  ```
+
+- Usage (Stage 3): **Table Editor**.
