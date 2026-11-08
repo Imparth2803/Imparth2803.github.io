@@ -14,6 +14,7 @@ import {AuthState, useAuth} from "./auth/session";
 import SignInPanel from "./auth/SignInPanel";
 import AccountBar from "./auth/AccountBar";
 import FeedbackForm from "./feedback/FeedbackForm";
+import {useUsageRecording} from "./usage/recorder";
 
 /* Each tool's code is fetched the first time its page opens, then reused.
    (Every loader is typed with the limits its tool takes; the registry
@@ -36,6 +37,7 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
     service.seo.description
   );
   const auth = useAuth();
+  useUsageRecording(service.slug, auth.status === "signedIn");
 
   return (
     <main

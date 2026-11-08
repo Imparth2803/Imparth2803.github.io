@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {CancelledError, ToolError} from "../worker/WorkerClient";
+import {track} from "../usage";
 
 export type ItemState<R> =
   | {status: "waiting"}
@@ -23,13 +24,22 @@ export function useBatch<T extends {id: number}, R>() {
     async (items: readonly T[], work: (item: T) => Promise<R>) => {
       setRunning(true);
       setStates(new Map(items.map(item => [item.id, {status: "waiting"}])));
+      const started = performance.now();
+      let done = 0;
+      let failed = 0;
       await Promise.all(
         items.map(item =>
           work(item).then(
-            result =>
-              mounted.current &&
-              setStates(s => new Map(s).set(item.id, {status: "done", result})),
+            result => {
+              done++;
+              if (mounted.current) {
+                setStates(s =>
+                  new Map(s).set(item.id, {status: "done", result})
+                );
+              }
+            },
             error => {
+              if (!(error instanceof CancelledError)) failed++;
               if (!mounted.current || error instanceof CancelledError) return;
               if (!(error instanceof ToolError)) console.error(error);
               const message =
@@ -43,6 +53,12 @@ export function useBatch<T extends {id: number}, R>() {
           )
         )
       );
+      track("batch", {
+        items: items.length,
+        done,
+        failed,
+        ms: Math.round(performance.now() - started)
+      });
       if (mounted.current) setRunning(false);
     },
     []

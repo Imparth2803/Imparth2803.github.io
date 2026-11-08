@@ -1,4 +1,5 @@
 import React from "react";
+import {track} from "../shared/usage";
 
 interface State {
   failed: boolean;
@@ -18,6 +19,7 @@ export default class ToolErrorBoundary extends React.Component<
 
   override componentDidCatch(error: unknown) {
     console.error(error);
+    track("crash");
   }
 
   override render() {

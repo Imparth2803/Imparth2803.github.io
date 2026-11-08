@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "./Auth.scss";
 import {AuthState, deleteAccount, signOut} from "./session";
+import {flushUsage} from "../usage/recorder";
 
 /* Who is signed in, with sign out and delete account. Shows nothing while
    the sign-in state is still being checked. */
@@ -36,7 +37,10 @@ export default function AccountBar({auth}: {auth: AuthState}) {
       <button
         type="button"
         className="tool-button tool-button-quiet"
-        onClick={() => void signOut()}
+        onClick={() => {
+          flushUsage(); // send waiting usage records while still signed in
+          void signOut();
+        }}
         disabled={busy}
       >
         Sign out

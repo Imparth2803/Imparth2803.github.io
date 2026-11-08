@@ -38,7 +38,12 @@ function setState(next: AuthState) {
   listeners.forEach(listener => listener(next));
 }
 
+/* The signed-in person's current access token, kept for sending usage
+   records as the page closes (there's no time to ask the library then). */
+let accessToken: string | null = null;
+
 function fromSession(session: Session | null, notice?: string): AuthState {
+  accessToken = session?.access_token ?? null;
   if (session) return {status: "signedIn", email: session.user.email ?? ""};
   return notice ? {status: "signedOut", notice} : {status: "signedOut"};
 }
@@ -207,6 +212,26 @@ export async function postToDatabase(
     },
     body: JSON.stringify(body)
   });
+}
+
+/** Sends a signed-in request that may outlive the page (for when the person
+    leaves). Returns false when nobody is signed in. Failures are ignored. */
+export function sendBeforeLeaving(path: string, body: unknown): boolean {
+  if (!accessToken) return false;
+  fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method: "POST",
+    keepalive: true,
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify(body)
+  }).catch(() => {
+    // Lost records aren't worth bothering the person about.
+  });
+  return true;
 }
 
 /** Deletes the account and everything stored with it, then signs out. */

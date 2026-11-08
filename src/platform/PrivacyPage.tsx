@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 import "../containers/blogPage/BlogPage.scss";
+import "./Privacy.scss";
 import {Link} from "../utils/router";
 import {contactInfo, greeting} from "../portfolio";
 import {usePageMeta} from "./usePageMeta";
+import {setUsageRecording, usageRecordingOn} from "./usage/recorder";
 
 /* /privacy: what the site keeps about people, in plain words. Keep it in step
    with what the code actually stores (src/platform/auth, supabase/migrations). */
@@ -70,9 +72,45 @@ export default function PrivacyPage() {
           decide what to improve.
         </p>
 
+        <h2>What you do in the tools</h2>
+        <p>
+          To see which tools are used and where they go wrong, we keep a short
+          record of what you do in a tool while you're signed in, linked to your
+          account:
+        </p>
+        <ul>
+          <li>opening a tool;</li>
+          <li>
+            adding files: how many, their type (such as PNG or CSV) and their
+            rough total size (such as "1–10 MB");
+          </li>
+          <li>pasting text: only its rough length;</li>
+          <li>
+            each task finishing: whether it worked, failed or was cancelled, and
+            how long it took;
+          </li>
+          <li>
+            batches: how many items, how many worked and how long it took;
+          </li>
+          <li>
+            downloading or copying a result: the format (such as XLSX) and its
+            rough size;
+          </li>
+          <li>a tool crashing.</li>
+        </ul>
+        <p>
+          We never record file names, what's in your files, the text you paste
+          or type, your results, or error messages. The database itself refuses
+          anything that could hold them: it only accepts numbers and short fixed
+          words. Records are sent when you leave a tool or switch tabs, never
+          while a tool is working on your files. Only the site's owner can read
+          them.
+        </p>
+        <UsageChoice />
+
         <h2>Who stores it</h2>
         <p>
-          Accounts and feedback are stored by{" "}
+          Accounts, feedback and usage records are stored by{" "}
           <a href="https://supabase.com">Supabase</a>, on its servers in the
           Asia-Pacific region. For security, Supabase also records the IP
           address and browser used for each sign-in. The site itself is hosted
@@ -86,17 +124,20 @@ export default function PrivacyPage() {
         <h2>Stored in your browser</h2>
         <p>
           Your browser keeps your sign-in so you don't have to sign in on every
-          visit, and remembers whether you chose the light or dark theme. These
-          are kept in your browser's local storage, not in cookies, and are
-          removed when you sign out or clear your browser's site data.
+          visit, and remembers whether you chose the light or dark theme and
+          whether you turned usage records off. These are kept in your browser's
+          local storage, not in cookies. Your sign-in is removed when you sign
+          out, and everything is removed when you clear your browser's site
+          data.
         </p>
 
         <h2>Deleting your account</h2>
         <p>
           Once signed in, use <strong>Delete account</strong> at the top of any
           tool page. It deletes your account and everything stored with it,
-          including your feedback, straight away. You can also email{" "}
-          <a href={`mailto:${email}`}>{email}</a> and we'll delete it for you.
+          including your feedback and usage records, straight away. You can also
+          email <a href={`mailto:${email}`}>{email}</a> and we'll delete it for
+          you.
         </p>
 
         <h2>Changes</h2>
@@ -111,5 +152,28 @@ export default function PrivacyPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+/* The "Record my usage" switch. It applies to this browser. */
+function UsageChoice() {
+  const [on, setOn] = useState(usageRecordingOn);
+  return (
+    <label className="privacy-choice">
+      <input
+        type="checkbox"
+        checked={on}
+        onChange={event => {
+          setUsageRecording(event.target.checked);
+          setOn(event.target.checked);
+        }}
+      />
+      <span>
+        <strong>Record my usage</strong> in this browser.{" "}
+        {on
+          ? "Untick to stop: nothing more will be recorded from this browser."
+          : "Off: nothing is recorded from this browser. Tick to turn it back on."}
+      </span>
+    </label>
   );
 }

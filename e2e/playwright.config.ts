@@ -9,8 +9,9 @@ import {defineConfig, devices} from "@playwright/test";
    run after those, on their own, so they can't slow the others down.
 
    The tools need a signed-in account, so every test starts with a saved
-   (fake, offline) sign-in from auth/signed-in.json. auth.spec.ts covers
-   signing in and out, with Supabase's replies stubbed. */
+   (fake, offline) sign-in from auth/signed-in.json, with usage records
+   turned off so nothing is sent. auth.spec.ts and usage.spec.ts cover
+   signing in and usage records, with Supabase's replies stubbed. */
 export default defineConfig({
   testDir: "./tests",
   outputDir: "./test-results",

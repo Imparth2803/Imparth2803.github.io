@@ -121,4 +121,40 @@ to talk to your Supabase project, and only that project.
   order by f.created_at desc;
   ```
 
-- Usage (Stage 3): **Table Editor**.
+- Usage records (Stage 3, [`003_usage_events.sql`](migrations/003_usage_events.sql)):
+  open **Table Editor → usage_events**. Each row is one action: `open`,
+  `files_added`, `text_pasted`, `task`, `batch`, `download`, `copy` or
+  `crash`, with numbers and short words in `details`. Rows from one visit to a
+  tool share a `page_session`. Useful queries:
+
+  ```sql
+  -- Which tools are used most (last 30 days)
+  select tool, count(distinct page_session) as visits,
+         count(distinct user_id) as people
+  from public.usage_events
+  where action = 'open' and occurred_at > now() - interval '30 days'
+  group by tool order by visits desc;
+
+  -- How often visits end in a download, per tool
+  select tool,
+         count(distinct page_session) filter (where action = 'download')::float
+           / nullif(count(distinct page_session), 0) as share_downloading
+  from public.usage_events
+  group by tool order by share_downloading desc;
+
+  -- Where tools go wrong
+  select tool, action, count(*)
+  from public.usage_events
+  where action = 'crash'
+     or (action = 'task' and details->>'outcome' = 'error')
+     or (action = 'batch' and (details->>'failed')::int > 0)
+  group by tool, action order by count(*) desc;
+
+  -- Slowest tasks (median and 95th percentile, milliseconds)
+  select tool,
+         percentile_cont(0.5) within group (order by (details->>'ms')::int) as median_ms,
+         percentile_cont(0.95) within group (order by (details->>'ms')::int) as p95_ms
+  from public.usage_events
+  where action = 'task' and details->>'outcome' = 'ok'
+  group by tool order by p95_ms desc;
+  ```

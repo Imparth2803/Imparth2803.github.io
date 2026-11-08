@@ -1,3 +1,5 @@
+import {fileType, sizeBand, track} from "../usage";
+
 /* Saves a file to the person's device. The temporary link is released
    straight after the download starts. */
 export function downloadBlob(blob: Blob, fileName: string): void {
@@ -11,6 +13,7 @@ export function downloadBlob(blob: Blob, fileName: string): void {
   link.remove();
   // Firefox needs the URL to live until the download has started.
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  track("download", {format: fileType(fileName), size: sizeBand(blob.size)});
 }
 
 /* Copies text held in a Blob. Must be called straight from a click so the
@@ -22,12 +25,14 @@ export async function copyBlobText(blob: Blob): Promise<void> {
       await navigator.clipboard.write([
         new ClipboardItem({"text/plain": plain})
       ]);
+      track("copy", {what: "result"});
       return;
     } catch {
       // Fall through: some browsers only allow writeText.
     }
   }
   await navigator.clipboard.writeText(await plain.text());
+  track("copy", {what: "result"});
 }
 
 /* "orders.csv" -> "orders"; used to name downloads after the input file. */

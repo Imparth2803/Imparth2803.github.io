@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {Notice} from "../../../shared/ui/ToolStep";
+import {track} from "../../../shared/usage";
 import {Rgba, toHex, toHsl, toRgb} from "../logic/colour";
 
 export const PICKER_NOTE =
@@ -32,6 +33,7 @@ export function PickerPanel({
   const copy = async (label: string, text: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      track("copy", {what: "colour"});
       setCopied(`Copied ${label}: ${text}`);
     } catch {
       setCopied(

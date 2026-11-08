@@ -1,0 +1,36 @@
+@import "../_globalColor";
+
+/* The "Record my usage" switch on /privacy. */
+.privacy-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 1.25em;
+  padding: 12px 16px;
+  border: 1px solid $hairline;
+  background-color: $accentSoft;
+  font-size: 16px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.privacy-choice input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: $accent1;
+}
+.privacy-choice input:focus-visible {
+  outline: 2px solid $accent1;
+  outline-offset: 2px;
+}
+
+.dark-mode {
+  .privacy-choice {
+    border-color: $hairlineDark;
+    background-color: $accentSoftDark;
+  }
+  .privacy-choice input {
+    accent-color: $accentLight;
+  }
+}
