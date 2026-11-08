@@ -23,6 +23,7 @@ import {BlogIndex, BlogPost, NotFound} from "./blogPage/BlogPage";
 import CommunityPage from "./communityPage/CommunityPage";
 import CatalogPage from "../platform/CatalogPage";
 import ServicePage from "../platform/ServicePage";
+import PrivacyPage from "../platform/PrivacyPage";
 import {useLocation, matchRoute} from "../utils/router";
 import {splashScreen} from "../portfolio";
 import {StyleProvider} from "../contexts/StyleContext";
@@ -84,6 +85,7 @@ const Main = () => {
               <ServicePage service={route.service} />
             )}
             {route.name === "community" && <CommunityPage />}
+            {route.name === "privacy" && <PrivacyPage />}
             {route.name === "notFound" && <NotFound />}
             <Footer />
             <ScrollToTopButton />

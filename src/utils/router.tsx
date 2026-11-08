@@ -19,6 +19,7 @@ export type Route =
   | {name: "blogIndex"}
   | {name: "blogPost"; slug: string}
   | {name: "community"}
+  | {name: "privacy"}
   | {name: "services"}
   | {name: "service"; service: ServiceDefinition}
   | {name: "notFound"};
@@ -62,6 +63,7 @@ export function matchRoute(path: string): Route {
   if (clean === "/") return {name: "home"};
   if (clean === "/blog") return {name: "blogIndex"};
   if (clean === "/community") return {name: "community"};
+  if (clean === "/privacy") return {name: "privacy"};
   if (clean === "/services") return {name: "services"};
   const tool = clean.match(/^\/services\/([\w-]+)$/);
   const service = tool?.[1] ? findService(tool[1]) : undefined;

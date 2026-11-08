@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Privacy: the page may only talk to its own origin, so files used in
-         the /services tools can never be uploaded anywhere. GitHub Pages
+    <!-- Privacy: the page may only talk to its own origin and to Supabase
+         (sign-in for the /services tools; REACT_APP_SUPABASE_URL is filled in
+         at build time). The tools never send files there. GitHub Pages
          cannot send HTTP headers, so the policy is set here. Images from
          GitHub are allowed for the profile avatar on the homepage. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://avatars.githubusercontent.com; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://avatars.githubusercontent.com; font-src 'self' data:; connect-src 'self' %REACT_APP_SUPABASE_URL%; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 
     <!-- Edit meta tags for SEO -->
     <title>Parth Tawde | Python Developer &amp; Data Scientist</title>

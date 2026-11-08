@@ -48,6 +48,7 @@ const paths = [
   ...blogSlugs().map(slug => `/blog/${slug}`),
   "/community",
   "/services",
+  "/privacy",
   ...loadRegistry().map(service => `/services/${service.slug}`)
 ];
 

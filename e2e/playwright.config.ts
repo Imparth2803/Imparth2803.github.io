@@ -6,7 +6,11 @@ import {defineConfig, devices} from "@playwright/test";
    The timing tests (performance.spec.ts) run last, one at a time, so other
    tests running in parallel can't make the page look slower than it is.
    The Image Editor's heavy timing tests (image-editor-performance.spec.ts)
-   run after those, on their own, so they can't slow the others down. */
+   run after those, on their own, so they can't slow the others down.
+
+   The tools need a signed-in account, so every test starts with a saved
+   (fake, offline) sign-in from auth/signed-in.json. auth.spec.ts covers
+   signing in and out, with Supabase's replies stubbed. */
 export default defineConfig({
   testDir: "./tests",
   outputDir: "./test-results",
@@ -15,7 +19,8 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: "http://localhost:5056",
-    acceptDownloads: true
+    acceptDownloads: true,
+    storageState: "./auth/signed-in.json"
   },
   webServer: {
     command: "node serve.js ../build 5056",

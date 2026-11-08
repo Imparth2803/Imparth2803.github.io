@@ -10,6 +10,9 @@ import ToolErrorBoundary from "./ToolErrorBoundary";
 import {usePageMeta} from "./usePageMeta";
 import PrivacyNote from "./PrivacyNote";
 import {formatCount} from "../shared/text/numbers";
+import {AuthState, useAuth} from "./auth/session";
+import SignInPanel from "./auth/SignInPanel";
+import AccountBar from "./auth/AccountBar";
 
 /* Each tool's code is fetched the first time its page opens, then reused.
    (Every loader is typed with the limits its tool takes; the registry
@@ -31,6 +34,7 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
     `${service.seo.title} | ${greeting.username}`,
     service.seo.description
   );
+  const auth = useAuth();
 
   return (
     <main
@@ -56,24 +60,26 @@ export default function ServicePage({service}: {service: ServiceDefinition}) {
         </h1>
         <p className="blog-page-lede">{service.summary}</p>
         <PrivacyNote />
+        <AccountBar auth={auth} />
       </header>
-      <LiveTool service={service} />
+      <LiveTool service={service} auth={auth} />
     </main>
   );
 }
 
-function LiveTool({service}: {service: ServiceDefinition}) {
-  const Tool = toolComponent(service);
+/* The tool itself only opens once the person is signed in. The description
+   below it is always shown. */
+function LiveTool({
+  service,
+  auth
+}: {
+  service: ServiceDefinition;
+  auth: AuthState;
+}) {
   const {limits} = service;
   return (
     <>
-      <ToolErrorBoundary>
-        <Suspense
-          fallback={<p className="blog-page-status">Loading the tool…</p>}
-        >
-          <Tool limits={limits} />
-        </Suspense>
-      </ToolErrorBoundary>
+      <ToolOrSignIn service={service} auth={auth} />
       <section className="service-page-section service-page-about">
         <h2>About this tool</h2>
         <p>{service.description}</p>
@@ -84,6 +90,44 @@ function LiveTool({service}: {service: ServiceDefinition}) {
       </section>
     </>
   );
+}
+
+function ToolOrSignIn({
+  service,
+  auth
+}: {
+  service: ServiceDefinition;
+  auth: AuthState;
+}) {
+  switch (auth.status) {
+    case "loading":
+      return (
+        <p className="blog-page-status">Checking whether you're signed in…</p>
+      );
+    case "unavailable":
+      return (
+        <div className="tool-notice tool-notice-error" role="alert">
+          <p>
+            Sign-in isn't working right now, so the tool can't open. Please try
+            again later.
+          </p>
+        </div>
+      );
+    case "signedOut":
+      return <SignInPanel toolName={service.name} notice={auth.notice} />;
+    case "signedIn": {
+      const Tool = toolComponent(service);
+      return (
+        <ToolErrorBoundary>
+          <Suspense
+            fallback={<p className="blog-page-status">Loading the tool…</p>}
+          >
+            <Tool limits={service.limits} />
+          </Suspense>
+        </ToolErrorBoundary>
+      );
+    }
+  }
 }
 
 function aboutLimits(limits: ServiceLimits): string {

@@ -1,0 +1,108 @@
+@import "../../_globalColor";
+
+/* Sign-in panel (in place of a tool) and the account bar under page titles. */
+
+.auth-panel {
+  max-width: 520px;
+  margin: 8px 0 40px;
+  padding: 24px;
+  border: 1px solid $hairline;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.auth-panel h2 {
+  margin: 0;
+  font-size: 22px;
+  color: $ink;
+}
+.auth-lede,
+.auth-or,
+.auth-fineprint {
+  margin: 0;
+}
+.auth-lede {
+  font-size: 16px;
+  color: $inkSoft;
+}
+.auth-or {
+  font-family: $monoFont;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $inkMuted;
+}
+.auth-email {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+.auth-email .tool-field {
+  flex: 1 1 240px;
+}
+.auth-email .tool-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px; // 16px stops iOS zooming in on focus
+}
+.auth-panel .tool-notice {
+  align-self: stretch;
+}
+.auth-panel .tool-notice .tool-button {
+  margin-top: 8px;
+  padding-left: 0;
+}
+.auth-fineprint {
+  font-size: 14px;
+  color: $inkMuted;
+}
+.auth-fineprint a {
+  color: $accent1;
+  text-underline-offset: 3px;
+}
+
+.auth-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: $inkMuted;
+}
+.auth-bar strong {
+  color: $inkSoft;
+  overflow-wrap: anywhere;
+}
+.auth-bar .tool-button {
+  padding: 6px 8px;
+}
+.auth-bar-problem {
+  flex-basis: 100%;
+  margin: 0;
+  color: #c62828;
+}
+
+.dark-mode {
+  .auth-panel {
+    border-color: $hairlineDark;
+  }
+  .auth-panel h2,
+  .auth-bar strong {
+    color: $textColorDark;
+  }
+  .auth-lede {
+    color: $inkSoftDark;
+  }
+  .auth-or,
+  .auth-fineprint,
+  .auth-bar {
+    color: $inkMutedDark;
+  }
+  .auth-fineprint a {
+    color: $accentLight;
+  }
+}

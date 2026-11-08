@@ -7,6 +7,8 @@ import {SERVICE_CATEGORIES, ServiceCategory, services} from "./registry";
 import {filterServices} from "./catalogSearch";
 import {usePageMeta} from "./usePageMeta";
 import PrivacyNote from "./PrivacyNote";
+import {useAuth} from "./auth/session";
+import AccountBar from "./auth/AccountBar";
 
 /* /services: the catalog of every tool in the registry. */
 export default function CatalogPage() {
@@ -20,6 +22,7 @@ export default function CatalogPage() {
     `${servicesSection.title} | ${greeting.username}`,
     servicesSection.subtitle
   );
+  const auth = useAuth();
 
   return (
     <main className="blog-page">
@@ -35,6 +38,7 @@ export default function CatalogPage() {
         <h1 className="blog-page-title">{servicesSection.title}</h1>
         <p className="blog-page-lede">{servicesSection.subtitle}</p>
         <PrivacyNote />
+        <AccountBar auth={auth} />
       </header>
 
       <div className="services-filters">

@@ -254,8 +254,12 @@ test.describe("problems are explained in plain words", () => {
   test("a tool that fails to load doesn't break the rest of the site", async ({
     page
   }) => {
+    // Open the catalog first so sign-in (its own chunk) has loaded, then
+    // make the tool's code fail to download.
+    await page.goto("/services");
+    await expect(page.getByText("Signed in as")).toBeVisible();
     await page.route(/\/static\/js\/.*\.chunk\.js$/, route => route.abort());
-    await page.goto("/services/list-cleaner");
+    await page.getByRole("link", {name: /List Cleaner/}).click();
     await expect(page.getByRole("alert")).toContainText("ran into a problem");
     await page.unroute(/\/static\/js\/.*\.chunk\.js$/);
     await page.getByRole("link", {name: "← All tools"}).click();
